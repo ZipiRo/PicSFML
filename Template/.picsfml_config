@@ -1,0 +1,24 @@
+{
+    "binary": [],
+    "build": {
+        "debug": {
+            "flags": ""
+        },
+        "release": {
+            "flags": ""
+        }
+    },
+    "paths": {
+        "include": [],
+        "library": []
+    },
+    "project": {
+        "gcc": "change this",
+        "main": "main.cpp",
+        "name": "change this",
+        "output": "main",
+        "sfml": "change this",
+        "use_audio": false,
+        "use_network": false
+    }
+}
