@@ -13,11 +13,12 @@
         "library": []
     },
     "project": {
-        "gcc": "change this",
-        "main": "main.cpp",
-        "name": "change this",
-        "output": "main",
-        "sfml": "change this",
+        "gcc": "",
+        "main": "",
+        "name": "",
+        "output": "",
+        "sfml": "",
+        "sfml_version": 3,
         "use_audio": false,
         "use_network": false
     }
