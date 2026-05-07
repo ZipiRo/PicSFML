@@ -40,7 +40,7 @@ struct BuildConfig
     BuildType build_type;
     bool use_audio = false;
     bool use_network = false;
-    int sfml_version = 3;
+    int sfml_version = 300;
     std::string project_name, project_output; 
     std::filesystem::path picsfml_path, gcc_path, sfml_path, main_source, project_path; 
     std::vector<std::filesystem::path> binaries, includes, libraries;
@@ -75,7 +75,7 @@ bool GetBuildConfigData(const json &project_config, BuildConfig &build_config)
 
     build_config.use_audio = project_config["project"].value("use_audio", false);
     build_config.use_network = project_config["project"].value("use_network", false);
-    build_config.sfml_version = project_config["project"].value("sfml_version", 3);
+    build_config.sfml_version = project_config["project"].value("sfml_version", 300);
     build_config.build_flags[Debug] = project_config["build"]["debug"]["flags"];
     build_config.build_flags[Release] = project_config["build"]["release"]["flags"];
 
@@ -161,15 +161,15 @@ bool BuildProject(const BuildConfig &build_config)
 
     std::string libraries;
 
-    libraries += sfml_libraries[build_config.build_type][0] + (build_config.build_type == Debug) ? "-d " : " ";
-    libraries += sfml_libraries[build_config.build_type][1] + (build_config.build_type == Debug) ? "-d " : " ";
-    libraries += sfml_libraries[build_config.build_type][2] + (build_config.build_type == Debug) ? "-d " : " ";
+    libraries += sfml_libraries[0] + ((build_config.build_type == Debug) ? "-d " : " ");
+    libraries += sfml_libraries[1] + ((build_config.build_type == Debug) ? "-d " : " ");
+    libraries += sfml_libraries[2] + ((build_config.build_type == Debug) ? "-d " : " ");
 
     if(build_config.use_audio)
-        libraries += sfml_libraries[build_config.build_type][3] + (build_config.build_type == Debug) ? "-d " : " ";
+        libraries += sfml_libraries[3] + ((build_config.build_type == Debug) ? "-d " : " ");
 
     if(build_config.use_network)
-        libraries += sfml_libraries[build_config.build_type][4] + (build_config.build_type == Debug) ? "-d " : " ";
+        libraries += sfml_libraries[4] + ((build_config.build_type == Debug) ? "-d " : " ");
 
     command += "-L" + build_config.sfml_path.string() + "/lib ^ " + libraries;
 
@@ -193,47 +193,41 @@ bool BuildProject(const BuildConfig &build_config)
 
 void WorkBuildDirectory(const BuildConfig &build_config)
 {   
-    std::cout << "Cleaning build directory...\n";
+    std::filesystem::path to = build_config.project_path / build_directory[build_config.build_type];
 
-    for(const auto &entry : std::filesystem::directory_iterator(build_config.project_path / build_directory[build_config.build_type]))
+    for(const auto &entry : std::filesystem::directory_iterator(to))
     {
         if(entry.path().extension() != ".dll") continue;
         std::filesystem::remove(entry.path());
     }
 
-    if(std::filesystem::exists(build_config.project_path / build_directory[build_config.build_type] / "Resources"))
-        std::filesystem::remove_all(build_config.project_path / build_directory[build_config.build_type] / "Resources");
-
     std::cout << "Adding binaries...\n";
 
-    std::filesystem::path to = build_config.project_path / build_directory[build_config.build_type];
-
-    for(const auto &file : gcc_binaries)
-        std::filesystem::copy(build_config.gcc_path / "bin" / file, to / file);
-
-    for(int i = 0; i < sfml_binaries[build_config.build_type].size(); i++)
+    for(int i = 0; i < sfml_binaries.size(); i++)
     {
         if(i == 3 && !build_config.use_audio) continue;
         if(i == 4 && !build_config.use_network) continue; 
 
-        std::string binary = sfml_binaries[build_config.build_type][i] + (build_config.build_type == Debug) ? "-d-" : "-" + 
-                            std::to_string(build_config.sfml_version) + ".dll"; 
+        std::string binary = sfml_binaries[i] + ((build_config.build_type == Debug) ? "-d-" : "-") + std::to_string(build_config.sfml_version / 100) + ".dll"; 
+
         std::filesystem::copy(build_config.sfml_path / "bin" / binary, to / binary);
     }
+
+    for(const auto &file : gcc_binaries)
+        std::filesystem::copy(build_config.gcc_path / "bin" / file, to / file);
 
     for(const auto &path : build_config.binaries)
         std::filesystem::copy(path, to / path.filename());
 
     std::cout << "Adding resources...\n";
 
-    std::filesystem::copy(build_config.project_path / "Resources", to / "Resources", std::filesystem::copy_options::recursive);
+    if(std::filesystem::exists(to / "Resources")) std::filesystem::remove_all(to / "Resources");
+
+    std::filesystem::copy(build_config.project_path / "Resources/", to / "Resources/", std::filesystem::copy_options::recursive);
 }
 
 bool BuildOption(BuildConfig &build_config)
 {
-    if(build_config.project_path.string()[0] == '.') build_config.project_path = std::filesystem::current_path(); 
-    else build_config.project_path = std::filesystem::absolute(build_config.project_path);
-
     std::cout << "PicSFML: " << build_config.picsfml_path.string() << '\n';
     std::cout << "Project: " << build_config.project_path.string() << '\n';
 

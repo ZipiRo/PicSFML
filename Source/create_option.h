@@ -3,7 +3,7 @@ struct CreateConfig
     std::string name = "PicSFMLProject", output = "main", main = "main.cpp";
     std::filesystem::path picsfml_path, project_path, gcc_path, sfml_path;
     bool use_audio = false, use_network = false;
-    int sfml_version = 3;
+    int sfml_version = 300;
     
     bool use_vscode = false;
 };
@@ -90,9 +90,6 @@ bool SetVSCConfig(const CreateConfig &create_config)
 
 bool CreateOption(CreateConfig &create_config)
 {
-    if(create_config.project_path.string()[0] == '.') create_config.project_path = std::filesystem::current_path(); 
-    else create_config.project_path = std::filesystem::absolute(create_config.project_path);
-
     std::cout << "PicSFML: " << create_config.picsfml_path.string() << '\n';
     std::cout << "Project: " << create_config.project_path.string() << '\n';
 

@@ -18,7 +18,7 @@
         "name": "",
         "output": "",
         "sfml": "",
-        "sfml_version": 3,
+        "sfml_version": 0,
         "use_audio": false,
         "use_network": false
     }
