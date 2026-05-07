@@ -39,7 +39,6 @@ bool GetConfigJSON(const std::filesystem::path &path, json &result)
 
 bool SetConfigJSON(const std::filesystem::path &path, const json &config_file)
 {
-
     std::ofstream json_file(path);
 
     if(!json_file) return false;
@@ -50,7 +49,6 @@ bool SetConfigJSON(const std::filesystem::path &path, const json &config_file)
 
     return true;
 }
-
 #include "build_option.h"
 #include "create_option.h"
 
@@ -70,6 +68,39 @@ std::filesystem::path GetLocalPath()
     return std::filesystem::path(buffer);
 }
 
+void HelpOption()
+{
+    std::cout << "PicSFML SFML Project Creator & Builder\n";
+    std::cout << "--------------------------------------\n";
+
+    std::cout << "Usage:\n";
+    std::cout << "picsfml [option] <path> [argumets]\n";
+    std::cout << '\n';
+    
+    std::cout << "Options:\n";
+    std::cout << "  -b Build Project\n";
+    std::cout << "Arguments:\n";
+    std::cout << "      -r Release build\n";
+    std::cout << "      -d Debug build\n";
+    std::cout << '\n';
+
+    std::cout << "  -c Create project\n";
+    std::cout << "Arguments:\n";
+    std::cout << "      -n Project name <string> (default PicSFMLProject)\n";
+    std::cout << "      -o Output name <string> (default main)\n";
+    std::cout << "      -m Main file name <string> (default main.cpp)\n";
+    std::cout << "      -g GCC path <string> (path to mingwx directory)\n";
+    std::cout << "      -s SFML path <string> (path to sfml-x.x.x directory)\n";
+    std::cout << "      -sv SFML version <int> (default 3) (available versions 2, 3)\n";
+    std::cout << "      -vs Use VSCode properties file (default false)\n";
+    std::cout << "      -audio Use SFML audio (default false)\n";
+    std::cout << "      -network Use SFML network (default false)\n";
+    std::cout << '\n';
+    
+    std::cout << "-h, --help Show help message\n";
+    std::cout << "-v, --version Show version\n";
+}
+
 int main(int argc, char** argv)
 { 
     option = Waiting;
@@ -84,8 +115,25 @@ int main(int argc, char** argv)
         
         return 0;
     }
-
+    
     int index = 1;
+
+    std::string flag(argv[index++]);
+    if(flag == "-b") option = Build;
+    else if(flag == "-c") option = Create;
+    else if(flag == "-h" || flag == "--help") 
+    {
+        HelpOption();
+        return 0;
+    }
+    else if(flag == "-v" || flag == "--version")
+    {
+        return 0;
+    }
+
+    std::string arg(argv[index++]);
+    project_path = arg;
+    
     while (index < argc)
     {
         std::string flag(argv[index++]);
@@ -93,27 +141,9 @@ int main(int argc, char** argv)
         switch (option)
         {
         case Waiting:
-            if(flag == "-b") option = Build;
-            else if(flag == "-c") option = Create;
-            else if(flag == "-h") 
-            {
-                option = Help;
-                break;
-            } 
-            else if(flag == "--version")
-            {
-                option = Version;
-                break;  
-            } 
             break;
         case Build:
-            if(flag == "-p")
-            {
-                std::string arg(argv[index++]);
-                project_path = arg;
-                create_config.project_path = arg;
-            }
-            else if(flag == "-r")
+            if(flag == "-r")
             {    
                 build_config.build_type = Release;
             }
@@ -123,13 +153,7 @@ int main(int argc, char** argv)
             }
             break;
         case Create:
-            if(flag == "-p")
-            {
-                std::string arg(argv[index++]);
-                project_path = arg;
-                create_config.project_path = arg;
-            }
-            else if(flag == "-n")
+            if(flag == "-n")
             {
                 std::string arg(argv[index++]);
                 create_config.name = arg;
@@ -181,16 +205,13 @@ int main(int argc, char** argv)
     {
     case Build:
         if(project_path.empty()) return 1;
+        build_config.project_path = project_path;
         if(!BuildOption(build_config)) return 1;
         break;
     case Create:
         if(project_path.empty()) return 1;
+        create_config.project_path = project_path;
         if(!CreateOption(create_config)) return 1;
-        break;
-    case Help:
-        break;
-    case Version:
-        std::cout << "PicSFML v1.0.0" << '\n';
         break;
     default:
         break;
