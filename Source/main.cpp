@@ -58,7 +58,9 @@ enum OPTION
 {
     Waiting,
     Build,
-    Create
+    Create,
+    Help,
+    Version
 } option;
 
 std::filesystem::path GetLocalPath()
@@ -92,7 +94,17 @@ int main(int argc, char** argv)
         {
         case Waiting:
             if(flag == "-b") option = Build;
-            else if(flag == "-c") option = Create; 
+            else if(flag == "-c") option = Create;
+            else if(flag == "-h") 
+            {
+                option = Help;
+                break;
+            } 
+            else if(flag == "--version")
+            {
+                option = Version;
+                break;  
+            } 
             break;
         case Build:
             if(flag == "-p")
@@ -165,15 +177,20 @@ int main(int argc, char** argv)
         }
     }
 
-    if(project_path.empty()) return 1;
-
     switch (option)
     {
     case Build:
+        if(project_path.empty()) return 1;
         if(!BuildOption(build_config)) return 1;
         break;
     case Create:
+        if(project_path.empty()) return 1;
         if(!CreateOption(create_config)) return 1;
+        break;
+    case Help:
+        break;
+    case Version:
+        std::cout << "PicSFML v1.0.0" << '\n';
         break;
     default:
         break;
