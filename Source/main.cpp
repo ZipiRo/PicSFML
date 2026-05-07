@@ -108,7 +108,7 @@ void VersionOption()
                 "and linking libraryes for any other things you want to add.\n"
                 "Surely works with SFML-2.6.2, SFML-3.0.0, more in  the future.\n"
                 "Created on 05/05/2026 and Last Updated 05/07/2026.\n"
-                "PicSFML Version 1.0.5\n";
+                "PicSFML Version 1.0.6\n";
 }
 
 void FlagNotExistent(const std::string &flag)
@@ -129,6 +129,12 @@ bool CheckSFMLVersion(int version)
 
 int main(int argc, char** argv)
 { 
+    if(argc <= 1) 
+    {
+        std::cout << "No option selected, try -h, --help for more information.\n";
+        return 0;
+    }
+    
     sfml_version_core[262] = "SFML-2.6.2";
     sfml_version_core[300] = "SFML-3.0.0";
 
@@ -138,15 +144,8 @@ int main(int argc, char** argv)
 
     BuildConfig build_config{.picsfml_path = picsfml_path};
     CreateConfig create_config{.picsfml_path = picsfml_path};
-
-    if(argc <= 1) 
-    {
-        std::cout << "No option selected, try -h, --help for more information.\n";
-        return 0;
-    }
     
     int index = 1;
-
     std::string flag(argv[index++]);
     if(flag == "-b" || flag == "--build") option = Build;
     else if(flag == "-c" || flag == "--create") option = Create;

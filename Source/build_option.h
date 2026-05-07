@@ -36,14 +36,12 @@ enum BuildType
 
 struct BuildConfig
 {
-    std::string build_flags[2]; 
     BuildType build_type;
-    bool use_audio = false;
-    bool use_network = false;
-    int sfml_version = 300;
-    std::string project_name, project_output; 
+    std::string project_name, project_output, build_flags[2]; 
     std::filesystem::path picsfml_path, gcc_path, sfml_path, main_source, project_path; 
     std::vector<std::filesystem::path> binaries, includes, libraries;
+    bool use_audio = false, use_network = false;
+    int sfml_version = 300;
 };
 
 bool GetBuildConfigData(const json &project_config, BuildConfig &build_config)
@@ -128,13 +126,10 @@ bool CompileProject(const BuildConfig &build_config)
     for(const auto &path : build_config.includes)
         command += "-I" + path.string() + " ";
 
-    std::cout << "Compleing project...\n";
-
-    std::cout << command << '\n';
-    
     if(system(command.c_str()) != 0) 
     {
         std::cout << "Had some problems compiling\n";
+        std::cout << "Command: " << command << '\n';
         return false;
     }
 
@@ -144,7 +139,7 @@ bool CompileProject(const BuildConfig &build_config)
 
 bool BuildProject(const BuildConfig &build_config)
 {
-    std::string command;
+    std::string command, libraries;
 
     command += build_config.gcc_path.string() + "/bin/g++.exe " + 
                 build_config.build_flags[build_config.build_type] + " ";
@@ -158,8 +153,6 @@ bool BuildProject(const BuildConfig &build_config)
     command += build_config.main_source.stem().string() + ".o -o " + 
                 build_config.project_path.string() + "/" + build_directory[build_config.build_type] + "/" + 
                 build_config.project_output + " ";
-
-    std::string libraries;
 
     libraries += sfml_libraries[0] + ((build_config.build_type == Debug) ? "-d " : " ");
     libraries += sfml_libraries[1] + ((build_config.build_type == Debug) ? "-d " : " ");
@@ -175,19 +168,15 @@ bool BuildProject(const BuildConfig &build_config)
 
     for(auto path : build_config.libraries)
         command += path.string();
-
-
-    std::cout << "Building project...\n";
-
-    std::cout << command << '\n';
     
     if(system(command.c_str()) != 0) 
     {
         std::cout << "Had some problems building\n";
+        std::cout << "Command: " + command << '\n';
         return false;
     }
 
-    std::cout << "Building sucessful\n"; 
+    std::cout << "Build sucessful\n"; 
     return true;
 }
 
@@ -200,8 +189,6 @@ void WorkBuildDirectory(const BuildConfig &build_config)
         if(entry.path().extension() != ".dll") continue;
         std::filesystem::remove(entry.path());
     }
-
-    std::cout << "Adding binaries...\n";
 
     for(int i = 0; i < sfml_binaries.size(); i++)
     {
@@ -219,8 +206,6 @@ void WorkBuildDirectory(const BuildConfig &build_config)
     for(const auto &path : build_config.binaries)
         std::filesystem::copy(path, to / path.filename());
 
-    std::cout << "Adding resources...\n";
-
     if(std::filesystem::exists(to / "Resources")) std::filesystem::remove_all(to / "Resources");
 
     std::filesystem::copy(build_config.project_path / "Resources/", to / "Resources/", std::filesystem::copy_options::recursive);
@@ -228,9 +213,6 @@ void WorkBuildDirectory(const BuildConfig &build_config)
 
 bool BuildOption(BuildConfig &build_config)
 {
-    std::cout << "PicSFML: " << build_config.picsfml_path.string() << '\n';
-    std::cout << "Project: " << build_config.project_path.string() << '\n';
-
     json project_config;
 
     if(!GetConfigJSON(build_config.project_path / PROJECT_CONFIG_NAME, project_config)) return 1;
@@ -241,6 +223,10 @@ bool BuildOption(BuildConfig &build_config)
     if(!GetBuildConfigData(project_config, build_config))
         return false;
 
+    std::cout << "Building PicSFML project '" + build_config.project_name + "'\n";
+    std::cout << "BuildType: " + std::string((build_config.build_type == Debug) ? "Debug" : "Release") + "\n";
+    std::cout << "Building for " + sfml_version_core[build_config.sfml_version] + "\n";
+    
     if(!CompileProject(build_config))
     {
         std::cout << "Aborting...\n";
@@ -254,6 +240,8 @@ bool BuildOption(BuildConfig &build_config)
     }
 
     WorkBuildDirectory(build_config);
+
+    std::cout << "Sucessful\n";
 
     return true;
 }

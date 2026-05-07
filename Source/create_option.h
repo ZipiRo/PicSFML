@@ -2,10 +2,8 @@ struct CreateConfig
 {
     std::string name = "PicSFMLProject", output = "main", main = "main.cpp";
     std::filesystem::path picsfml_path, project_path, gcc_path, sfml_path;
-    bool use_audio = false, use_network = false;
+    bool use_audio = false, use_network = false, use_vscode = false;
     int sfml_version = 300;
-    
-    bool use_vscode = false;
 };
 
 void CopyApplicationBase(const CreateConfig &create_config)
@@ -47,6 +45,8 @@ bool SetPicSFMLConfig(const CreateConfig &create_config)
 
     if(!SetConfigJSON(to, project_config)) return false;
 
+    std::cout << "PicSFML config file set\n";
+
     return true;
 }
 
@@ -85,13 +85,15 @@ bool SetVSCConfig(const CreateConfig &create_config)
 
     if(!SetConfigJSON(to, vscode_config)) return false;
 
+    std::cout << "VSCode properities file set\n";
+
     return true;
 }
 
 bool CreateOption(CreateConfig &create_config)
 {
-    std::cout << "PicSFML: " << create_config.picsfml_path.string() << '\n';
-    std::cout << "Project: " << create_config.project_path.string() << '\n';
+    std::cout << "Creating PicSFML project '" + create_config.name + "'\n";
+    std::cout << "SFML version " + sfml_version_core[create_config.sfml_version] + "\n";
 
     CopyApplicationBase(create_config);
     
@@ -106,6 +108,8 @@ bool CreateOption(CreateConfig &create_config)
         std::cout << "Aborting...\n";
         return false;
     }
+
+    std::cout << "Sucessful\n";
 
     return true;
 }
