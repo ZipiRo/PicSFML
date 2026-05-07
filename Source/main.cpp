@@ -1,3 +1,33 @@
+/*
+    ============================================================
+                            PicSFML
+              SFML Project Creator & Build Utility
+    ============================================================
+
+    PicSFML is a command-line utility designed to simplify
+    creating and building SFML projects with GCC/MinGW.
+
+    Features:
+    - Create ready-to-build SFML projects
+    - Automatic SFML DLL management
+    - Resource directory copying
+    - Debug and Release build support
+    - Optional VSCode configuration generation
+    - Optional SFML Audio and Network modules
+
+    Supported SFML Versions:
+    - SFML 2.6.2
+    - SFML 3.0.0
+
+    Configuration:
+    Uses `.picsfml_config` for project settings, libraries,
+    include paths, binaries, and additional configuration.
+
+    Author: ZipiRo
+    Version: 1.0.7
+    ============================================================
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -91,7 +121,7 @@ void HelpOption()
     std::cout << "      -m          Main file name <string> (default main.cpp)\n";
     std::cout << "      -g          GCC path <string> (path to mingwx directory)\n";
     std::cout << "      -s          SFML path <string> (path to sfml-x.x.x directory)\n";
-    std::cout << "      -sv         SFML version <int> (default 3) {available: 262, 300}\n";
+    std::cout << "      -sv         SFML version <int> (default 3) {versions suported: 262, 300}\n";
     std::cout << "      -vs         Use VSCode properties file (default false)\n";
     std::cout << "      --audio      Use SFML audio (default false)\n";
     std::cout << "      --network    Use SFML network (default false)\n";
@@ -105,10 +135,10 @@ void VersionOption()
 {
     std::cout << "PicSFML SFML Project Creator & Builder, by ZipiRo.\n"
                 "Created to simplify SFML project creation, and makeing it easier with including code\n"
-                "and linking libraryes for any other things you want to add.\n"
+                "and linking libraryes for any other things you want to add to your project.\n"
                 "Surely works with SFML-2.6.2, SFML-3.0.0, more in  the future.\n"
                 "Created on 05/05/2026 and Last Updated 05/07/2026.\n"
-                "PicSFML Version 1.0.6\n";
+                "PicSFML Version 1.0.7\n";
 }
 
 void FlagNotExistent(const std::string &flag)
