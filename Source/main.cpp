@@ -24,7 +24,7 @@
     include paths, binaries, and additional configuration.
 
     Author: ZipiRo
-    Version: 1.0.7
+    Version: 1.0.8
     ============================================================
 */
 
