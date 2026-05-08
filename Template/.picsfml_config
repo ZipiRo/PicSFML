@@ -8,10 +8,8 @@
             "flags": ""
         }
     },
-    "paths": {
-        "include": [],
-        "library": []
-    },
+    "include": [],
+    "library": [],
     "project": {
         "gcc": "",
         "main": "",

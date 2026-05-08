@@ -31,7 +31,7 @@ protected:
     virtual void Start() {};
     virtual void End() {};
     virtual void Update(float delta_time) = 0;
-    virtual void Event(const sf::Event &event) {};
+    virtual void Events(const sf::Event &event) {};
     virtual void DrawWorld() {}; 
     virtual void DrawCanvas() {};
 public:
@@ -68,7 +68,7 @@ public:
                     window.close();
                 
                 Input::FetchInputData(event);
-                Event(event);
+                Events(event);
             }
 
             float delta_time = delta_clock.restart().asSeconds();

@@ -21,7 +21,7 @@ public:
 
         sf::Music &player = instance.player;
 
-        player.openFromFile(music_path);
+        if(!player.openFromFile(music_path)) return;
         player.setLooping(settings.loop);
         player.setVolume(instance.ComputeVolume(settings.volume));
         player.setPitch(settings.pitch);
@@ -31,6 +31,12 @@ public:
         player.setMinDistance(settings.min_distance);
         player.setMaxDistance(settings.max_distance);
         player.setAttenuation(settings.attenuation);
+    }
+
+    static void SetMasterVolume(float volume)
+    {
+        auto& instance = GetInstance();
+        instance.master_volume = volume;
     }
 
     static void Play(SoundSettings settings = {.loop = true})
