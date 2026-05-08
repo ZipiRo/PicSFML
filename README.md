@@ -164,15 +164,3 @@ When building a project PicSFML:
 | ---------- | --------- |
 | SFML 2.6.2 | Yes       |
 | SFML 3.0.0 | Yes       |
-
----
-
-# Author
-
-Created by ZipiRo.
-
----
-
-# Version
-
-Current Version: `1.0.10`
