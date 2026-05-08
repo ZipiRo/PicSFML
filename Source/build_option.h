@@ -100,15 +100,7 @@ bool GetBuildConfigData(const json &project_config, BuildConfig &build_config)
     }
 
     for(auto path : project_config["paths"]["library"])
-    {
-        if(!std::filesystem::exists(path)) 
-        {
-            std::cout << "File " << path << " not found\n";
-            return false;
-        }   
-
         build_config.libraries.push_back(path);
-    }
 
     return true;
 }
@@ -141,8 +133,10 @@ bool BuildProject(const BuildConfig &build_config)
 {
     std::string command, libraries;
 
-    command += build_config.gcc_path.string() + "/bin/g++.exe " + 
-                build_config.build_flags[build_config.build_type] + " ";
+    command += build_config.gcc_path.string() + "/bin/g++.exe ";
+
+    if(!build_config.build_flags[build_config.build_type].empty())
+        command += build_config.build_flags[build_config.build_type] + " ";
 
     if(build_config.use_audio)
         command += AUDIO_DEFINE + " ";
@@ -167,7 +161,7 @@ bool BuildProject(const BuildConfig &build_config)
     command += "-L" + build_config.sfml_path.string() + "/lib ^ " + libraries;
 
     for(auto path : build_config.libraries)
-        command += path.string();
+        command += path.string() + " ";
     
     if(system(command.c_str()) != 0) 
     {

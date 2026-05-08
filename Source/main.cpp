@@ -121,7 +121,7 @@ void HelpOption()
     std::cout << "      -m          Main file name <string> (default main.cpp)\n";
     std::cout << "      -g          GCC path <string> (path to mingwx directory)\n";
     std::cout << "      -s          SFML path <string> (path to sfml-x.x.x directory)\n";
-    std::cout << "      -sv         SFML version <int> (default 3) {versions suported: 262, 300}\n";
+    std::cout << "      -sv         SFML version <int> (default 300) {versions suported: 262, 300}\n";
     std::cout << "      -vs         Use VSCode properties file (default false)\n";
     std::cout << "      --audio      Use SFML audio (default false)\n";
     std::cout << "      --network    Use SFML network (default false)\n";
@@ -138,7 +138,7 @@ void VersionOption()
                 "and linking libraryes for any other things you want to add to your project.\n"
                 "Surely works with SFML-2.6.2, SFML-3.0.0, more in  the future.\n"
                 "Created on 05/05/2026 and Last Updated 05/07/2026.\n"
-                "PicSFML Version 1.0.7\n";
+                "PicSFML Version 1.0.8\n";
 }
 
 void FlagNotExistent(const std::string &flag)

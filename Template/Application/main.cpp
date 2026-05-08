@@ -1,7 +1,4 @@
 #include <App.h>
-using namespace sf;
-
-float angle = 0;
 
 int main()
 {

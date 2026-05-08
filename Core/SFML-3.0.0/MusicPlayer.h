@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <SFML/Audio/Music.hpp>
 #include <SoundSettings.h>
 
