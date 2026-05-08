@@ -156,14 +156,6 @@ When building a project PicSFML:
 * Copies custom binaries
 * Copies the `Resources/` folder
 
-Generated build folders:
-
-```txt
-Build/
-├── Debug/
-└── Release/
-```
-
 ---
 
 # Supported SFML Versions
@@ -172,14 +164,6 @@ Build/
 | ---------- | --------- |
 | SFML 2.6.2 | Yes       |
 | SFML 3.0.0 | Yes       |
-
----
-
-# Motivation
-
-PicSFML was made to remove repetitive setup work when starting SFML projects.
-
-The goal is to make experimenting with graphics programming faster and easier, especially for beginner C++ developers.
 
 ---
 
