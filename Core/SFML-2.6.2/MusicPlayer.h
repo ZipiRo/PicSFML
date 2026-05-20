@@ -15,6 +15,18 @@ private:
     }
 
 public:
+    static void SetMasterVolume(float volume)
+    {
+        auto& instance = GetInstance();
+        instance.master_volume = volume;
+    }
+
+    static int GetMasterVolume()
+    {
+        auto& instance = GetInstance();
+        return instance.master_voulume;
+    }
+    
     static void Set(std::string music_path, SoundSettings settings = {.loop = true})
     {
         auto &instance = GetInstance();

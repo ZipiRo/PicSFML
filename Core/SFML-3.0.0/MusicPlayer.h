@@ -39,6 +39,12 @@ public:
         instance.master_volume = volume;
     }
 
+    static int GetMasterVolume()
+    {
+        auto& instance = GetInstance();
+        return instance.master_voulume;
+    }
+
     static void Play(SoundSettings settings = {.loop = true})
     {
         auto &instance = GetInstance();
