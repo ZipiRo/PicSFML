@@ -39,7 +39,7 @@ public:
     static int GetMasterVolume()
     {
         auto& instance = GetInstance();
-        return instance.master_voulume;
+        return instance.master_volume;
     }
 
     static void Play(const sf::SoundBuffer& buffer, SoundSettings settings = {})

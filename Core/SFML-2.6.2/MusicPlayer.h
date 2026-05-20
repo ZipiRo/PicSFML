@@ -24,7 +24,7 @@ public:
     static int GetMasterVolume()
     {
         auto& instance = GetInstance();
-        return instance.master_voulume;
+        return instance.master_volume;
     }
     
     static void Set(std::string music_path, SoundSettings settings = {.loop = true})

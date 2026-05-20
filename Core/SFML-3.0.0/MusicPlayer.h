@@ -15,6 +15,18 @@ private:
     }
 
 public:
+    static void SetMasterVolume(float volume)
+    {
+        auto& instance = GetInstance();
+        instance.master_volume = volume;
+    }
+
+    static int GetMasterVolume()
+    {
+        auto& instance = GetInstance();
+        return instance.master_volume;
+    }
+
     static void Set(std::string music_path, SoundSettings settings = {.loop = true})
     {
         auto &instance = GetInstance();
@@ -31,18 +43,6 @@ public:
         player.setMinDistance(settings.min_distance);
         player.setMaxDistance(settings.max_distance);
         player.setAttenuation(settings.attenuation);
-    }
-
-    static void SetMasterVolume(float volume)
-    {
-        auto& instance = GetInstance();
-        instance.master_volume = volume;
-    }
-
-    static int GetMasterVolume()
-    {
-        auto& instance = GetInstance();
-        return instance.master_voulume;
     }
 
     static void Play(SoundSettings settings = {.loop = true})
