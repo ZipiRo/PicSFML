@@ -195,7 +195,7 @@ void WorkBuildDirectory(const BuildConfig &build_config)
 
     if(std::filesystem::exists(to / "Resources")) std::filesystem::remove_all(to / "Resources");
 
-    std::filesystem::copy(build_config.project_path / "Resources/", to / "Resources/", std::filesystem::copy_options::recursive);
+    std::filesystem::copy(build_config.project_path / "Resources", to / "Resources", std::filesystem::copy_options::recursive);
 }
 
 bool BuildOption(BuildConfig &build_config)
