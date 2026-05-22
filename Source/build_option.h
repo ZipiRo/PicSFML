@@ -20,6 +20,8 @@ std::vector<std::string> sfml_file = {
     "sfml-network"
 };
 
+std::string no_cmd_library = "-mwindows";
+
 enum BuildType 
 { 
     Release, 
@@ -153,6 +155,9 @@ bool BuildProject(const BuildConfig &build_config)
 
     if(build_config.use_network)
         libraries += "-l" + sfml_file[4] + ((build_config.build_type == Debug) ? "-d " : " ");
+
+    if(build_config.build_type == Release)
+        libraries += no_cmd_library;
 
     command += "-L" + build_config.sfml_path.string() + "/lib ^ " + libraries;
     

@@ -4,7 +4,8 @@ Add the posibility if there is an icon set for the program to be set automatical
 
 Add posibility to recreate, or update an existing .picsfml config file.
 
-Add in the SFML framework a way to set the SFML window, like a settings struct.
+Add in the SFML framework a way to set the SFML window, like a settings struct. DONE
 
 Make it so that when you create a new template if there are already some files to skip them.
 
+Remove cmd for Release version. DONE

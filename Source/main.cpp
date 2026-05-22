@@ -24,7 +24,7 @@
     include paths, binaries, and additional configuration.
 
     Author: ZipiRo
-    Version: 1.0.11
+    Version: 1.0.12
     ============================================================
 */
 
@@ -137,8 +137,8 @@ void VersionOption()
                 "Created to simplify SFML project creation, and makeing it easier with including code\n"
                 "and linking libraryes for any other things you want to add to your project.\n"
                 "Surely works with SFML-2.6.2, SFML-3.0.0, more in  the future.\n"
-                "Created on 05/05/2026 and Last Updated 05/20/2026.\n"
-                "PicSFML Version 1.0.11\n";
+                "Created on 05/05/2026 and Last Updated 05/22/2026.\n"
+                "PicSFML Version 1.0.12\n";
 }
 
 void FlagNotExistent(const std::string &flag)
