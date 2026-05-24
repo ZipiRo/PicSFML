@@ -15,8 +15,9 @@
         "main": "",
         "name": "",
         "output": "",
+        "application_version": "1.0.0.0",
         "sfml": "",
-        "sfml_version": 0,
+        "sfml_version": "3.0.0",
         "use_audio": false,
         "use_network": false
     }

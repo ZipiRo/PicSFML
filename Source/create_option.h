@@ -1,9 +1,9 @@
 struct CreateConfig
 {
+    PVersion sfml_version = PVersion("3.0.0");
     std::string name = "PicSFMLProject", output = "main", main = "main.cpp";
     std::filesystem::path picsfml_path, project_path, gcc_path, sfml_path;
     bool use_audio = false, use_network = false, use_vscode = false;
-    int sfml_version = 300;
 };
 
 void CopyApplicationBase(const CreateConfig &create_config)
@@ -38,10 +38,10 @@ bool SetPicSFMLConfig(const CreateConfig &create_config)
 
     if(!create_config.sfml_path.empty())
         project_config["project"]["sfml"] = create_config.sfml_path;
-
+        
     project_config["project"]["use_audio"] = create_config.use_audio;
     project_config["project"]["use_network"] = create_config.use_network;
-    project_config["project"]["sfml_version"] = create_config.sfml_version;
+    project_config["project"]["sfml_version"] = create_config.sfml_version.AsString('.');
 
     if(!SetConfigJSON(to, project_config)) return false;
 
@@ -81,7 +81,7 @@ bool SetVSCConfig(const CreateConfig &create_config)
         vscode_config["configurations"][0]["includePath"].push_back("Add SFML include path");
     }
 
-    vscode_config["configurations"][0]["includePath"].push_back(create_config.picsfml_path.string() + "/Core/" + sfml_version_core[create_config.sfml_version]);
+    vscode_config["configurations"][0]["includePath"].push_back(create_config.picsfml_path.string() + "/Core/" + sfml_version_core[create_config.sfml_version.AsInt()]);
 
     if(!SetConfigJSON(to, vscode_config)) return false;
 
@@ -93,7 +93,7 @@ bool SetVSCConfig(const CreateConfig &create_config)
 bool CreateOption(CreateConfig &create_config)
 {
     std::cout << "Creating PicSFML project '" + create_config.name + "'\n";
-    std::cout << "SFML version " + sfml_version_core[create_config.sfml_version] + "\n";
+    std::cout << "SFML version " + sfml_version_core[create_config.sfml_version.AsInt()] + "\n";
 
     CopyApplicationBase(create_config);
     

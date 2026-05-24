@@ -1,4 +1,5 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include <ResourceManager.h>
 #include <Input.h>
@@ -39,6 +40,16 @@ protected:
     virtual void DrawWorld() {}; 
     virtual void DrawCanvas() {};
 
+    void SetWindowIcon()
+    {
+        if(!std::filesystem::exists("icon.png")) return;
+
+        sf::Image icon;
+        if(!icon.loadFromFile("icon.png")) return;
+
+        window.setIcon(icon);
+    }
+
 public:
     static sf::Color background;
 
@@ -46,6 +57,8 @@ public:
     {
         instance = this;
         window = sf::RenderWindow(sf::VideoMode({size.x, size.y}), title, style, state, window_settings);
+
+        SetWindowIcon();
 
         window_size = sf::Vector2f(size);
         window_title = title;

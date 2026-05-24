@@ -1,3 +1,6 @@
 *.exe
 *.bat
 *.o
+
+.vscode
+_internal

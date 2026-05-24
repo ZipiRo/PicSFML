@@ -5,9 +5,9 @@ class App : public Application
 {
 private:
 public:
-    App() : Application(sf::Vector2u(200, 200), "Template") 
+    App() : Application(sf::Vector2u(400, 200), "PicSFMLApplication") 
     {
-        window.setFramerateLimit(60);
+        GetWindow().setFramerateLimit(60);
     }
 
     void Update(float) override;

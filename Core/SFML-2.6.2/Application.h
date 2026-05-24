@@ -40,6 +40,16 @@ protected:
     virtual void DrawWorld() {}; 
     virtual void DrawCanvas() {};
 
+    void SetWindowIcon()
+    {
+        if(!std::filesystem::exists("icon.png")) return;
+
+        sf::Image icon;
+        if(!icon.loadFromFile("icon.png")) return;
+
+        window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+    }
+
 public:
     static sf::Color background;
 
@@ -48,6 +58,8 @@ public:
         instance = this;
         window.create(sf::VideoMode({size.x, size.y}), title, style, window_settings);
         
+        SetWindowIcon();
+
         window_size = sf::Vector2f(size);
         window_title = title;
         canvas = window.getView();

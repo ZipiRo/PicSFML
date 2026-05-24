@@ -14,6 +14,8 @@
     - Debug and Release build support
     - Optional VSCode configuration generation
     - Optional SFML Audio and Network modules
+    - Sets the icon if there exists an icon.png file
+    - Set the application version in config file 
 
     Supported SFML Versions:
     - SFML 2.6.2
@@ -24,7 +26,7 @@
     include paths, binaries, and additional configuration.
 
     Author: ZipiRo
-    Version: 1.0.12
+    Version: 1.0.13
     ============================================================
 */
 
@@ -41,12 +43,23 @@ namespace Win32
     #include <windows.h>
 }
 
+#include <pversion.h>
+
 using json = nlohmann::json;
 
 const std::string PROJECT_CONFIG_NAME = ".picsfml_config";
 const std::string VSC_CONFIG_NAME = "c_cpp_properties.json";
+const std::string WINDOWS_RESOURCE = "resource";
+const std::string APPLICATION_ICON = "icon.png";
+const std::string WINDOWS_ICON = "icon.ico";
 
 std::map<int, std::string> sfml_version_core;
+
+void SetSFMLCoreVersions()
+{
+    sfml_version_core[300] = "SFML-3.0.0";
+    sfml_version_core[262] = "SFML-2.6.2";
+}
 
 bool GetConfigJSON(const std::filesystem::path &path, json &result)
 {
@@ -85,7 +98,7 @@ enum OPTION
     Build,
     Create,
     Help,
-    Version
+    ShowVersion
 } option;
 
 std::filesystem::path GetLocalPath()
@@ -119,12 +132,12 @@ void HelpOption()
     std::cout << "      -n          Project name <string> (default PicSFMLProject)\n";
     std::cout << "      -o          Output name <string> (default main)\n";
     std::cout << "      -m          Main file name <string> (default main.cpp)\n";
-    std::cout << "      -g          GCC path <string> (path to mingwx directory)\n";
-    std::cout << "      -s          SFML path <string> (path to sfml-x.x.x directory)\n";
-    std::cout << "      -sv         SFML version <int> (default 300) {versions suported: 262, 300}\n";
+    std::cout << "      -g          GCC path <string> (path to mingw(32|64) directory)\n";
+    std::cout << "      -s          SFML path <string> (path to SFML-x.x.x directory)\n";
+    std::cout << "      -sv         SFML version <string> (default 3.0.0) {versions suported: 2.6.2, 3.0.0}\n";
     std::cout << "      -vs         Use VSCode properties file (default false)\n";
-    std::cout << "      --audio      Use SFML audio (default false)\n";
-    std::cout << "      --network    Use SFML network (default false)\n";
+    std::cout << "      --audio     Use SFML audio (default false)\n";
+    std::cout << "      --network   Use SFML network (default false)\n";
     std::cout << '\n';
     
     std::cout << "  -h, --help        Show help\n";
@@ -137,8 +150,8 @@ void VersionOption()
                 "Created to simplify SFML project creation, and makeing it easier with including code\n"
                 "and linking libraryes for any other things you want to add to your project.\n"
                 "Surely works with SFML-2.6.2, SFML-3.0.0, more in  the future.\n"
-                "Created on 05/05/2026 and Last Updated 05/22/2026.\n"
-                "PicSFML Version 1.0.12\n";
+                "Created on 05/05/2026 and Last Updated 05/24/2026.\n"
+                "PicSFML Version 1.0.13\n";
 }
 
 void FlagNotExistent(const std::string &flag)
@@ -164,11 +177,9 @@ int main(int argc, char** argv)
         std::cout << "No option selected, try -h, --help for more information.\n";
         return 0;
     }
-    
-    sfml_version_core[262] = "SFML-2.6.2";
-    sfml_version_core[300] = "SFML-3.0.0";
 
-    option = Waiting;
+    SetSFMLCoreVersions();
+
     std::filesystem::path picsfml_path = GetLocalPath().parent_path();
     std::filesystem::path project_path;
 
@@ -258,8 +269,8 @@ int main(int argc, char** argv)
             else if(flag == "-sv")
             {
                 std::string arg(argv[index++]);
-                int sfml_version = atoi(arg.c_str());
-                if(!CheckSFMLVersion(sfml_version)) return 1;
+                PVersion sfml_version(arg);
+                if(!CheckSFMLVersion(sfml_version.AsInt())) return 1;
                 create_config.sfml_version = sfml_version;
             }
             else if(flag == "-vs")
