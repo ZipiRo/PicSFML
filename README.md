@@ -24,7 +24,9 @@ Built for Windows and designed mainly for fast prototyping and learning projects
 * JSON project configuration system
 * Custom include paths, binaries, and libraries
 * Includes a lightweight utility/core framework
-
+* Automatic set of the application icon
+* Application versioning and windows metadata
+ 
 ---
 
 ## Included Core Utilities
@@ -68,17 +70,17 @@ picsfml -c . -n Sandbox -sv 300 -vs --audio
 
 ### Create Arguments
 
-| Argument    | Description                   |
-| ----------- | ----------------------------- |
-| `-n`        | Project name                  |
-| `-o`        | Output executable name        |
-| `-m`        | Main source filename          |
-| `-g`        | Path to MinGW directory       |
-| `-s`        | Path to SFML directory        |
-| `-sv`       | SFML version (`262` or `300`) |
-| `-vs`       | Generate VSCode configuration |
-| `--audio`   | Enable SFML audio module      |
-| `--network` | Enable SFML network module    |
+| Argument    | Description                       |
+| ----------- | ----------------------------------|
+| `-n`        | Project name                      |
+| `-o`        | Output executable name            |
+| `-m`        | Main source filename              |
+| `-g`        | Path to MinGW directory           |
+| `-s`        | Path to SFML directory            |
+| `-sv`       | SFML version (`2.6.2` or `3.0.0`) |
+| `-vs`       | Generate VSCode configuration     |
+| `--audio`   | Enable SFML audio module          |
+| `--network` | Enable SFML network module        |
 
 ---
 
@@ -123,12 +125,13 @@ Example:
     "include": [],
     "library": [],
     "project": {
+        "application_version": "1.0.0.0",
         "gcc": "",
         "main": "",
         "name": "",
         "output": "",
         "sfml": "",
-        "sfml_version": 0,
+        "sfml_version": "3.0.0",
         "use_audio": false,
         "use_network": false
     }
