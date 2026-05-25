@@ -6,6 +6,6 @@ Add posibility to recreate, or update an existing .picsfml config file.
 
 Add in the SFML framework a way to set the SFML window, like a settings struct. DONE
 
-Make it so that when you create a new template if there are already some files to skip them.
+Make it so that when you create a new template if there are already some files to stop the procedure. DONE
 
 Remove cmd for Release version. DONE

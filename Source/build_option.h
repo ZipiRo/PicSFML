@@ -127,7 +127,7 @@ void CreateWindowsResource(const BuildConfig &build_config)
 {
     std::ofstream file;
     
-    file.open(build_config.project_path.string() + "/" + WINDOWS_RESOURCE + ".rc");
+    file.open(build_config.project_path.string() + "/" + WINDOWS_RESOURCE_NAME + ".rc");
 
     file <<
     "#include <windows.h>\n\n"
@@ -169,8 +169,8 @@ bool CompileWindowsResource(const BuildConfig &build_config)
     std::string command;
 
     command += "windres " +
-            build_config.project_path.string() + "/" + WINDOWS_RESOURCE + ".rc " + 
-            "-O coff -o " + WINDOWS_RESOURCE + ".o";
+            build_config.project_path.string() + "/" + WINDOWS_RESOURCE_NAME + ".rc " + 
+            "-O coff -o " + WINDOWS_RESOURCE_NAME + ".o";
 
     if(system(command.c_str()) != 0)
     {
@@ -191,7 +191,7 @@ bool CompileProject(const BuildConfig &build_config)
             build_config.project_path.string() + "/" + build_config.main_source.string() + " "
             "-I" + build_config.sfml_path.string() + "/include " +
             "-I" + build_config.project_path.string() + "/Include " +
-            "-I" + build_config.picsfml_path.string() + "/Core/" + sfml_version_core[build_config.sfml_version.AsInt()] + " ";
+            "-I" + build_config.picsfml_path.string() + "/Core/" + sfml_versions.at(build_config.sfml_version.AsInt()) + " ";
     
     for(const auto &path : build_config.includes)
         command += "-I" + path.string() + " ";
@@ -294,8 +294,8 @@ void WorkBuildDirectory(const BuildConfig &build_config)
 void CleanProject(const BuildConfig &build_config)
 {
     std::filesystem::remove(build_config.project_path / WINDOWS_ICON);
-    std::filesystem::remove(build_config.project_path / (WINDOWS_RESOURCE + ".rc"));
-    std::filesystem::remove(build_config.project_path / (WINDOWS_RESOURCE + ".o"));
+    std::filesystem::remove(build_config.project_path / (WINDOWS_RESOURCE_NAME + ".rc"));
+    std::filesystem::remove(build_config.project_path / (WINDOWS_RESOURCE_NAME + ".o"));
     std::filesystem::remove(build_config.project_path / (build_config.main_source.stem().string() + ".o"));
 }
 
@@ -303,7 +303,7 @@ bool BuildOption(BuildConfig &build_config)
 {
     json project_config;
 
-    if(!GetConfigJSON(build_config.project_path / PROJECT_CONFIG_NAME, project_config)) return 1;
+    if(!GetConfigJSON(build_config.project_path / PROJECT_CONFIG, project_config)) return 1;
 
     if(!std::filesystem::exists(build_config.project_path / build_directory[build_config.build_type]))
         std::filesystem::create_directories(build_config.project_path / build_directory[build_config.build_type]);
@@ -314,7 +314,7 @@ bool BuildOption(BuildConfig &build_config)
     std::cout << "Building PicSFML project '" + build_config.project_name + "'\n";
     std::cout << "BuildType: " + std::string((build_config.build_type == Debug) ? "Debug" : "Release") + "\n";
     std::cout << "BuildVersion: " + build_config.application_version.AsString('.') << "\n";
-    std::cout << "Building for " + sfml_version_core[build_config.sfml_version.AsInt()] + "\n";
+    std::cout << "Building for " + sfml_versions.at(build_config.sfml_version.AsInt()) + "\n";
     
     if(!CreateWindowsIcon(build_config))
     {
