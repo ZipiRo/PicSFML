@@ -32,7 +32,7 @@ struct BuildConfig
 {
     BuildType build_type;
     std::string project_name, project_output, build_flags[2]; 
-    std::filesystem::path picsfml_path, gcc_path, sfml_path, main_source, project_path; 
+    std::filesystem::path gcc_path, sfml_path, main_source, project_path; 
     std::vector<std::filesystem::path> binaries, includes, libraries;
     bool use_audio = false, use_network = false;
     PVersion sfml_version, application_version;
@@ -108,7 +108,7 @@ bool CreateWindowsIcon(const BuildConfig &build_config)
 
     std::string command;
 
-    command += build_config.picsfml_path.string() + "/make_icon.exe " +
+    command += picsfml_path.string() + "/make_icon.exe " +
             "--input " + build_config.project_path.string() + "/" + APPLICATION_ICON + " "
             "--output " + build_config.project_path.string() + "/" + WINDOWS_ICON;
 
@@ -191,7 +191,7 @@ bool CompileProject(const BuildConfig &build_config)
             build_config.project_path.string() + "/" + build_config.main_source.string() + " "
             "-I" + build_config.sfml_path.string() + "/include " +
             "-I" + build_config.project_path.string() + "/Include " +
-            "-I" + build_config.picsfml_path.string() + "/Core/" + sfml_versions.at(build_config.sfml_version.AsInt()) + " ";
+            "-I" + picsfml_path.string() + "/Core/" + sfml_versions.at(build_config.sfml_version.AsInt()) + " ";
     
     for(const auto &path : build_config.includes)
         command += "-I" + path.string() + " ";

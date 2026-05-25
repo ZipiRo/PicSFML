@@ -26,7 +26,7 @@
     include paths, binaries, and additional configuration.
 
     Author: ZipiRo
-    Version: 1.0.14
+    Version: 1.0.15
     ============================================================
 */
 
@@ -149,6 +149,7 @@ enum OPTION
     None,
     Build,
     Create,
+    Set,
     Help,
     ShowVersion
 } option;
@@ -170,6 +171,7 @@ int main(int argc, char** argv)
     std::string flag(argv[index++]);
     if(flag == "-b" || flag == "--build") option = Build;
     else if(flag == "-c" || flag == "--create") option = Create;
+    else if(flag == "-s" || flag == "--set") option = Set;
     else if(flag == "-h" || flag == "--help") 
     {
         HelpOption();
@@ -267,6 +269,8 @@ int main(int argc, char** argv)
             }
             else FlagNotExistent(flag);
             break;
+        case Set:
+            break;
         default:
             break;
         }
@@ -281,6 +285,8 @@ int main(int argc, char** argv)
     case Create:
         create_config.project_path = project_path;
         if(!CreateOption(create_config)) return 1;
+        break;
+    case Set:
         break;
     default:
         break;

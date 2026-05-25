@@ -2,7 +2,7 @@ struct CreateConfig
 {
     PVersion sfml_version = PVersion("3.0.0");
     std::string name = "PicSFML Project", output = "main", main = "main.cpp";
-    std::filesystem::path picsfml_path, project_path, gcc_path, sfml_path;
+    std::filesystem::path project_path, gcc_path, sfml_path;
     bool use_audio = false, use_network = false, use_vscode = false;
 };
 
@@ -13,7 +13,7 @@ bool CheckIsPicSFMLProject(const std::filesystem::path &project_path)
 
 void CopyApplicationBase(const CreateConfig &create_config)
 {
-    std::filesystem::path from = create_config.picsfml_path / "Template" / "Application";
+    std::filesystem::path from = picsfml_path / "Template" / "Application";
 
     for(const auto &entry : std::filesystem::directory_iterator(from))
     {
@@ -23,7 +23,7 @@ void CopyApplicationBase(const CreateConfig &create_config)
 
 bool SetPicSFMLConfig(const CreateConfig &create_config)
 {
-    std::filesystem::path what = create_config.picsfml_path / "Template" / PROJECT_CONFIG;
+    std::filesystem::path what = picsfml_path / "Template" / PROJECT_CONFIG;
     std::filesystem::path to = create_config.project_path / PROJECT_CONFIG;
     std::filesystem::copy(what, to);
 
@@ -55,7 +55,7 @@ bool SetVSCConfig(const CreateConfig &create_config)
 {
     std::filesystem::create_directory(create_config.project_path / ".vscode");
 
-    std::filesystem::path what = create_config.picsfml_path / "Template" / VSC_CONFIG;
+    std::filesystem::path what = picsfml_path / "Template" / VSC_CONFIG;
     std::filesystem::path to = create_config.project_path / ".vscode" / VSC_CONFIG;
     std::filesystem::copy(what, to);
 
@@ -66,7 +66,7 @@ bool SetVSCConfig(const CreateConfig &create_config)
     vscode_config["configurations"][0]["name"] = create_config.name;
 
     vscode_config["configurations"][0]["includePath"].push_back(
-        create_config.picsfml_path.string() + "/Core/" + sfml_versions.at(create_config.sfml_version.AsInt()));
+        picsfml_path.string() + "/Core/" + sfml_versions.at(create_config.sfml_version.AsInt()));
 
     if(!create_config.gcc_path.empty())
     {
