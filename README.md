@@ -65,7 +65,7 @@ picsfml -c <project_path>
 Example:
 
 ```bash
-picsfml -c . -n Sandbox -sv 300 -vs --audio
+picsfml -c . -n Sandbox -sv 3.0.0 -vs --audio
 ```
 
 ### Create Arguments
