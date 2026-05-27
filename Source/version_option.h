@@ -6,5 +6,5 @@ void VersionOption()
         "and linking libraryes for any other things you want to add to your project.\n"
         "Surely works with SFML-2.6.2, SFML-3.0.0, more in  the future.\n"
         "Created on 05/05/2026 and Last Updated 05/25/2026.\n"
-        "PicSFML Version 1.1.0\n";
+        "PicSFML Version " << PICSFML_VERSION.AsString('.') << "\n";
 }

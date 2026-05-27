@@ -26,7 +26,7 @@
     include paths, binaries, and additional configuration.
 
     Author: ZipiRo
-    Version: 1.1.0
+    Version: 1.1.1
     ============================================================
 */
 
@@ -70,6 +70,7 @@ enum Option
     ShowVersion
 };
 
+const PVersion PICSFML_VERSION = PVersion("1.1.1");
 const std::string PROJECT_CONFIG = ".picsfml_config";
 const std::string VSC_CONFIG = "c_cpp_properties.json";
 const std::string APPLICATION_ICON = "icon.png";
@@ -78,7 +79,7 @@ const std::string WINDOWS_RESOURCE_NAME = "resource";
 const std::filesystem::path picsfml_path = Win32::GetLocalPath().parent_path();
 std::filesystem::path project_path;
 
-bool RemovePath(std::vector<std::filesystem::path> &paths, std::string path)
+bool RemovePath(std::vector<std::filesystem::path> &paths, const std::string &path)
 {
     for(int i = 0; i < paths.size(); i++)
     {
@@ -128,6 +129,7 @@ bool CreatePicSFMLConfigJSON(const PicConfig &pic_config, const std::filesystem:
 
     json project_config;
 
+    project_config["version"] = PICSFML_VERSION.AsString('.');
     project_config["binary"] = pic_config.binary;
     project_config["include"] = pic_config.include;
     project_config["library"] = pic_config.library;
@@ -159,6 +161,7 @@ bool GetPicSFMLConfig(PicConfig &pic_config, std::filesystem::path &path)
 
     if(!GetConfigJSON(from, project_config)) return false;
 
+    pic_config.version.ParseString(project_config["version"]);
     pic_config.name = project_config["project"]["name"];
     pic_config.output = project_config["project"]["output"];
     pic_config.use_audio = project_config["project"].value("use_audio", false);
@@ -214,7 +217,7 @@ bool GetPicSFMLConfig(PicConfig &pic_config, std::filesystem::path &path)
 
     for(const auto &library : project_config["library"])
     {
-        if(library[0] == '-')
+        if(std::string(library)[0] == '-')
         {
             pic_config.library.push_back(library);
             continue;
@@ -295,11 +298,7 @@ int main(int argc, char** argv)
     std::string flag(argv[index++]);
     if(flag == "-b" || flag == "--build") option = Build;
     else if(flag == "-c" || flag == "--create") option = Create;
-    else if(flag == "-s" || flag == "--set") 
-    {
-        GetPicSFMLConfig(pic_config, project_path);
-        option = Set;
-    }
+    else if(flag == "-s" || flag == "--set") option = Set;
     else if(flag == "-h" || flag == "--help") 
     {
         HelpOption();
@@ -333,6 +332,8 @@ int main(int argc, char** argv)
     }
     else project_path = std::filesystem::absolute(project_path);
 
+    if(option == Set) GetPicSFMLConfig(pic_config, project_path);
+
     BuildType build_type = Release;
 
     while (index < argc)
@@ -342,43 +343,43 @@ int main(int argc, char** argv)
         switch (option)
         {
         case Build:
-            if(flag == "-r")
+            if(flag == "-r" || flag == "--release")
             {    
                 build_type = Release;
             }
-            else if(flag == "-d")
+            else if(flag == "-d" || flag == "--debug")
             {
                 build_type = Debug;
             }
             else FlagNotExistent(flag);
             break;
         case Create:
-            if(flag == "-n")
+            if(flag == "-n" || flag == "--name")
             {
                 std::string arg(argv[index++]);
                 pic_config.name = arg;
             }
-            else if(flag == "-o")
+            else if(flag == "-o" || flag == "--output")
             {
                 std::string arg(argv[index++]);
                 pic_config.output = arg;
             }
-            else if(flag == "-g")
+            else if(flag == "-g" || flag == "--gcc")
             {
                 std::string arg(argv[index++]);
                 pic_config.gcc_path = arg;
             }
-            else if(flag == "-s")
+            else if(flag == "-s" || flag == "--sfml")
             {
                 std::string arg(argv[index++]);
                 pic_config.sfml_path = arg;
             }
-            else if(flag == "-m")
+            else if(flag == "-m" || flag == "--main")
             {
                 std::string arg(argv[index++]);
                 pic_config.main = arg;
             }
-            else if(flag == "-sv")
+            else if(flag == "-sv" || flag == "--sfml_version")
             {
                 std::string arg(argv[index++]);
                 PVersion sfml_version(arg);
@@ -400,7 +401,7 @@ int main(int argc, char** argv)
             else FlagNotExistent(flag);
             break;
         case Set:
-            if(flag == "-n")
+            if(flag == "-n" || flag == "--name")
             {
                 std::string arg(argv[index++]);
 
@@ -415,7 +416,7 @@ int main(int argc, char** argv)
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-o")
+            else if(flag == "-o" || flag == "--output")
             {
                 std::string arg(argv[index++]);
 
@@ -430,7 +431,7 @@ int main(int argc, char** argv)
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-g")
+            else if(flag == "-g" || flag == "--gcc")
             {
                 std::string arg(argv[index++]);
 
@@ -445,7 +446,7 @@ int main(int argc, char** argv)
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-s")
+            else if(flag == "-s" || flag == "--sfml")
             {
                 std::string arg(argv[index++]);
 
@@ -460,7 +461,7 @@ int main(int argc, char** argv)
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-m")
+            else if(flag == "-m" || flag == "--main")
             {
                 std::string arg(argv[index++]);
 
@@ -475,7 +476,7 @@ int main(int argc, char** argv)
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-sv")
+            else if(flag == "-sv" || flag == "--sfml_version")
             {
                 std::string arg(argv[index++]);
 
@@ -492,7 +493,7 @@ int main(int argc, char** argv)
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-av")
+            else if(flag == "-av" || flag == "--application_version")
             {
                 std::string arg(argv[index++]);
 
@@ -508,7 +509,7 @@ int main(int argc, char** argv)
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-l")
+            else if(flag == "-l" || flag == "--library")
             {
                 std::string arg(argv[index++]);
 
@@ -519,13 +520,14 @@ int main(int argc, char** argv)
                 }
                 else if(arg == "--remove")
                 {
+                    arg = argv[index++];
                     if(arg == "--back") pic_config.library.pop_back();
                     else if(arg == "--front") pic_config.library.erase(pic_config.library.begin());
                     else RemovePath(pic_config.library, arg);
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-i")
+            else if(flag == "-i" || flag == "--include")
             {
                 std::string arg(argv[index++]);
 
@@ -536,13 +538,14 @@ int main(int argc, char** argv)
                 }
                 else if(arg == "--remove")
                 {
+                    arg = argv[index++];
                     if(arg == "--back") pic_config.include.pop_back();
                     else if(arg == "--front") pic_config.include.erase(pic_config.include.begin());
                     else RemovePath(pic_config.include, arg);
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-b")
+            else if(flag == "-b" || flag == "--binary")
             {
                 std::string arg(argv[index++]);
 
@@ -553,13 +556,14 @@ int main(int argc, char** argv)
                 }
                 else if(arg == "--remove")
                 {
+                    arg = argv[index++];
                     if(arg == "--back") pic_config.binary.pop_back();
                     else if(arg == "--front") pic_config.binary.erase(pic_config.binary.begin());
                     else RemovePath(pic_config.binary, arg);
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-df")
+            else if(flag == "-df" || flag == "--debug_flags")
             {
                 std::string arg(argv[index++]);
 
@@ -574,7 +578,7 @@ int main(int argc, char** argv)
                 }
                 else FlagNotExistent(arg);
             }
-            else if(flag == "-rf")
+            else if(flag == "-rf" || flag == "--release_flags")
             {
                 std::string arg(argv[index++]);
 

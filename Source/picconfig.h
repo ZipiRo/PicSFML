@@ -1,5 +1,6 @@
 struct PicConfig
 {
+    PVersion version;
     PVersion sfml_version = PVersion("3.0.0");
     PVersion application_version = PVersion("1.0.0.0");
     std::string name = "PicSFML Project";
