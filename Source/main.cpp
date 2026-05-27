@@ -153,7 +153,7 @@ bool CreatePicSFMLConfigJSON(const PicConfig &pic_config, const std::filesystem:
     return true;
 }
 
-bool GetPicSFMLConfig(PicConfig &pic_config, std::filesystem::path &path)
+bool GetPicSFMLConfig(PicConfig &pic_config, const std::filesystem::path &path)
 {
     std::filesystem::path from = path / PROJECT_CONFIG;
  
@@ -231,6 +231,57 @@ bool GetPicSFMLConfig(PicConfig &pic_config, std::filesystem::path &path)
         
         pic_config.library.push_back(library);
     }
+
+    return true;
+}
+
+bool CreateVSCodeConfigJSON(const PicConfig &pic_config, const std::filesystem::path &path)
+{
+    std::filesystem::create_directory(path / ".vscode");
+
+    std::filesystem::path to =
+        path / ".vscode" / VSC_CONFIG;
+
+    json vscode_config;
+
+    vscode_config["version"] = 4;
+    vscode_config["configurations"] = json::array();
+
+    json config;
+
+    config["name"] = pic_config.name;
+    config["cStandard"] = "c17";
+    config["cppStandard"] = "gnu++17";
+    config["intelliSenseMode"] = "windows-gcc-x64";
+
+    if(!pic_config.gcc_path.empty())
+    {
+        config["compilerPath"] =
+            (pic_config.gcc_path / "bin" / "g++.exe").string();
+    }
+    else
+    {
+        config["compilerPath"] = "";
+    }
+    config["includePath"] = json::array();
+    config["includePath"].push_back("${workspaceFolder}/**");
+    config["includePath"].push_back((picsfml_path / "Core" / SFMLCoreVersions().at(pic_config.sfml_version.AsInt())).string());
+
+    if(!pic_config.sfml_path.empty())
+    {
+        config["includePath"].push_back(
+            (pic_config.sfml_path / "include").string());
+    }
+
+    for(const auto &include : pic_config.include)
+        config["includePath"].push_back(include.string());
+
+    vscode_config["configurations"].push_back(config);
+
+    if(!CreateConfigJSON(to, vscode_config))
+        return false;
+
+    std::cout << "VSCode properties file created\n";
 
     return true;
 }

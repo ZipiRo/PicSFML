@@ -5,54 +5,12 @@ bool CheckIsPicSFMLProject(const std::filesystem::path &project_path)
 
 void CopyApplicationBase(const PicConfig &pic_config)
 {
-    std::filesystem::path from = picsfml_path / "Template" / "Application";
+    std::filesystem::path from = picsfml_path / "Template";
 
     for(const auto &entry : std::filesystem::directory_iterator(from))
     {
         std::filesystem::copy(entry, project_path / entry.path().filename());
     }
-}
-
-bool SetVSCodeConfig(const PicConfig &pic_config)
-{
-    std::filesystem::create_directory(project_path / ".vscode");
-
-    std::filesystem::path what = picsfml_path / "Template" / VSC_CONFIG;
-    std::filesystem::path to = project_path / ".vscode" / VSC_CONFIG;
-    std::filesystem::copy(what, to);
-
-    json vscode_config;
-
-    if(!GetConfigJSON(to, vscode_config)) return false;
-
-    vscode_config["configurations"][0]["name"] = pic_config.name;
-
-    vscode_config["configurations"][0]["includePath"].push_back(
-        picsfml_path.string() + "/Core/" + SFMLCoreVersions().at(pic_config.sfml_version.AsInt()));
-
-    if(!pic_config.gcc_path.empty())
-    {
-        vscode_config["configurations"][0]["compilerPath"] = pic_config.gcc_path.string() + "/bin/g++.exe";
-    }
-    else 
-    {
-        vscode_config["configurations"][0]["includePath"].push_back("Add G++ file path");
-    }
-
-    if(!pic_config.sfml_path.empty())
-    {
-        vscode_config["configurations"][0]["includePath"].push_back(pic_config.sfml_path.string() + "/include");
-    }
-    else 
-    {
-        vscode_config["configurations"][0]["includePath"].push_back("Add SFML include path");
-    }
-
-    if(!CreateConfigJSON(to, vscode_config)) return false;
-
-    std::cout << "VSCode Properities file created\n";
-
-    return true;
 }
 
 bool CreateOption(const PicConfig &pic_config)
@@ -75,7 +33,7 @@ bool CreateOption(const PicConfig &pic_config)
         return false;
     }
 
-    if(pic_config.use_vscode && !SetVSCodeConfig(pic_config))
+    if(pic_config.use_vscode && !CreateVSCodeConfigJSON(pic_config, project_path))
     {
         std::cout << "Aborting...\n";
         return false;

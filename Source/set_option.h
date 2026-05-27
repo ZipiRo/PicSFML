@@ -8,7 +8,7 @@ bool SetOption(const PicConfig &pic_config)
         return false;
     }
 
-    if(pic_config.use_vscode && !SetVSCodeConfig(pic_config))
+    if(pic_config.use_vscode && !CreateVSCodeConfigJSON(pic_config, project_path))
     {
         std::cout << "Aborting...\n";
         return false;
