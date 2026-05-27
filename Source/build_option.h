@@ -22,95 +22,15 @@ std::vector<std::string> sfml_file = {
 
 std::string no_cmd_library = "-mwindows";
 
-enum BuildType 
-{ 
-    Release, 
-    Debug 
-};
-
-struct BuildConfig
+bool CreateWindowsIcon(const PicConfig &pic_config)
 {
-    BuildType build_type;
-    std::string project_name, project_output, build_flags[2]; 
-    std::filesystem::path gcc_path, sfml_path, main_source, project_path; 
-    std::vector<std::filesystem::path> binaries, includes, libraries;
-    bool use_audio = false, use_network = false;
-    PVersion sfml_version, application_version;
-};
-
-bool GetBuildConfigData(const json &project_config, BuildConfig &build_config)
-{
-    if(!std::filesystem::exists(project_config["project"]["gcc"]))
-    {
-        std::cout << "GCC path "  << project_config["project"]["gcc"] << " not found\n";
-        return false;
-    } build_config.gcc_path = std::string(project_config["project"]["gcc"]);
-
-    if(!std::filesystem::exists(project_config["project"]["sfml"]))
-    {
-        std::cout << "SFML path "  << project_config["project"]["sfml"] << " not found\n";
-        return false;
-    } build_config.sfml_path = std::string(project_config["project"]["sfml"]);
-
-    if(!std::filesystem::exists(build_config.project_path / project_config["project"]["main"]))
-    {
-        std::cout << "Main file "  << project_config["project"]["main"] << " not found\n";
-        return false;
-    } build_config.main_source = std::string(project_config["project"]["main"]);
-
-    build_config.project_name = project_config["project"]["name"];
-
-    build_config.project_output = project_config["project"]["output"];
-    
-    build_config.use_audio = project_config["project"].value("use_audio", false);
-
-    build_config.use_network = project_config["project"].value("use_network", false);
-    
-    build_config.sfml_version.ParseString(project_config["project"]["sfml_version"]);
-
-    build_config.application_version.ParseString(project_config["project"]["application_version"]);
-    
-    build_config.build_flags[Debug] = project_config["build"]["debug"]["flags"];
-    
-    build_config.build_flags[Release] = project_config["build"]["release"]["flags"];
-
-    for(const auto &binary : project_config["binary"])
-    {
-        if(!std::filesystem::exists(binary) && binary.empty()) 
-        {
-            std::cout << "File " << binary << " not found\n";
-            return false;
-        }   
-
-        build_config.binaries.push_back(binary);
-    }
-
-    for(const auto &include : project_config["include"])
-    {
-        if(!std::filesystem::exists(include) && include.empty()) 
-        {
-            std::cout << "Include " << include << " not found\n";
-            return false;
-        }   
-
-        build_config.includes.push_back(include);  
-    }
-
-    for(const auto &library : project_config["library"])
-        build_config.libraries.push_back(library);
-
-    return true;
-}
-
-bool CreateWindowsIcon(const BuildConfig &build_config)
-{
-    if(!std::filesystem::exists(build_config.project_path / APPLICATION_ICON)) return false;
+    if(!std::filesystem::exists(project_path / APPLICATION_ICON)) return false;
 
     std::string command;
 
     command += picsfml_path.string() + "/make_icon.exe " +
-            "--input " + build_config.project_path.string() + "/" + APPLICATION_ICON + " "
-            "--output " + build_config.project_path.string() + "/" + WINDOWS_ICON;
+            "--input " + project_path.string() + "/" + APPLICATION_ICON + " "
+            "--output " + project_path.string() + "/" + WINDOWS_ICON;
 
     if(system(command.c_str()) != 0)
     {
@@ -123,20 +43,20 @@ bool CreateWindowsIcon(const BuildConfig &build_config)
     return true;
 }
 
-void CreateWindowsResource(const BuildConfig &build_config)
+void CreateWindowsResource(const PicConfig &pic_config)
 {
     std::ofstream file;
     
-    file.open(build_config.project_path.string() + "/" + WINDOWS_RESOURCE_NAME + ".rc");
+    file.open(project_path.string() + "/" + WINDOWS_RESOURCE_NAME + ".rc");
 
     file <<
     "#include <windows.h>\n\n"
     "IDI_ICON1 ICON \"icon.ico\"\n"
     "VS_VERSION_INFO VERSIONINFO\n"
     " FILEVERSION "
-    << build_config.application_version.AsString(',') << "\n"
+    << pic_config.application_version.AsString(',') << "\n"
     " PRODUCTVERSION "
-    << build_config.application_version.AsString(',') << "\n" 
+    << pic_config.application_version.AsString(',') << "\n" 
     " FILEOS VOS_NT_WINDOWS32\n"
     " FILETYPE VFT_APP\n"
     "BEGIN\n"
@@ -145,11 +65,11 @@ void CreateWindowsResource(const BuildConfig &build_config)
     "        BLOCK \"040904B0\"\n"
     "        BEGIN\n"
     "            VALUE \"ProductName\", \"" 
-    << build_config.project_output << "\"\n"
+    << pic_config.output << "\"\n"
     "            VALUE \"FileVersion\", \"" 
-    << build_config.application_version.AsString('.') << "\"\n"
+    << pic_config.application_version.AsString('.') << "\"\n"
     "            VALUE \"ProductVersion\", \"" 
-    << build_config.application_version.AsString('.') << "\"\n"
+    << pic_config.application_version.AsString('.') << "\"\n"
     "            VALUE \"FileDescription\", \"PicSFML Application\"\n"
     "        END\n"
     "    END\n"
@@ -164,12 +84,12 @@ void CreateWindowsResource(const BuildConfig &build_config)
     std::cout << "Windows Resource Created\n";
 }
 
-bool CompileWindowsResource(const BuildConfig &build_config)
+bool CompileWindowsResource(const PicConfig &pic_config)
 {
     std::string command;
 
     command += "windres " +
-            build_config.project_path.string() + "/" + WINDOWS_RESOURCE_NAME + ".rc " + 
+            project_path.string() + "/" + WINDOWS_RESOURCE_NAME + ".rc " + 
             "-O coff -o " + WINDOWS_RESOURCE_NAME + ".o";
 
     if(system(command.c_str()) != 0)
@@ -183,17 +103,17 @@ bool CompileWindowsResource(const BuildConfig &build_config)
     return true;
 }
 
-bool CompileProject(const BuildConfig &build_config)
+bool CompileProject(const PicConfig &pic_config)
 {
     std::string command;
 
-    command += build_config.gcc_path.string() + "/bin/g++.exe -c " + 
-            build_config.project_path.string() + "/" + build_config.main_source.string() + " "
-            "-I" + build_config.sfml_path.string() + "/include " +
-            "-I" + build_config.project_path.string() + "/Include " +
-            "-I" + picsfml_path.string() + "/Core/" + sfml_versions.at(build_config.sfml_version.AsInt()) + " ";
+    command += pic_config.gcc_path.string() + "/bin/g++.exe -c " + 
+            project_path.string() + "/" + pic_config.main + " "
+            "-I" + pic_config.sfml_path.string() + "/include " +
+            "-I" + project_path.string() + "/Include " +
+            "-I" + picsfml_path.string() + "/Core/" + SFMLCoreVersions().at(pic_config.sfml_version.AsInt()) + " ";
     
-    for(const auto &path : build_config.includes)
+    for(const auto &path : pic_config.include)
         command += "-I" + path.string() + " ";
 
     if(system(command.c_str()) != 0) 
@@ -207,42 +127,42 @@ bool CompileProject(const BuildConfig &build_config)
     return true;
 }
 
-bool BuildProject(const BuildConfig &build_config)
+bool BuildProject(const PicConfig &pic_config, BuildType build_type)
 {
     std::string command, libraries;
 
-    command += build_config.gcc_path.string() + "/bin/g++.exe ";
+    command += pic_config.gcc_path.string() + "/bin/g++.exe ";
 
-    if(!build_config.build_flags[build_config.build_type].empty())
-        command += build_config.build_flags[build_config.build_type] + " ";
+    if(!pic_config.flags[build_type].empty())
+        command += pic_config.flags[build_type] + " ";
 
-    if(build_config.use_audio)
+    if(pic_config.use_audio)
         command += AUDIO_DEFINE + " ";
 
-    if(build_config.use_network)
+    if(pic_config.use_network)
         command += NEWTWORK_DEFINE + " ";
 
-    command += build_config.main_source.stem().string() + ".o resource.o -o " +
-                build_config.project_path.string() + "/" + build_directory[build_config.build_type] + "/" + 
-                build_config.project_output + " ";
+    command += std::filesystem::path(pic_config.main).stem().string() + ".o resource.o -o " +
+                project_path.string() + "/" + build_directory[build_type] + "/" + 
+                pic_config.output + " ";
 
-    for(const auto &path : build_config.libraries)
+    for(const auto &path : pic_config.library)
         command += path.string() + " ";
 
-    libraries += "-l" + sfml_file[0] + ((build_config.build_type == Debug) ? "-d " : " ");
-    libraries += "-l" + sfml_file[1] + ((build_config.build_type == Debug) ? "-d " : " ");
-    libraries += "-l" + sfml_file[2] + ((build_config.build_type == Debug) ? "-d " : " ");
+    libraries += "-l" + sfml_file[0] + ((build_type == Debug) ? "-d " : " ");
+    libraries += "-l" + sfml_file[1] + ((build_type == Debug) ? "-d " : " ");
+    libraries += "-l" + sfml_file[2] + ((build_type == Debug) ? "-d " : " ");
 
-    if(build_config.use_audio)
-        libraries += "-l" + sfml_file[3] + ((build_config.build_type == Debug) ? "-d " : " ");
+    if(pic_config.use_audio)
+        libraries += "-l" + sfml_file[3] + ((build_type == Debug) ? "-d " : " ");
 
-    if(build_config.use_network)
-        libraries += "-l" + sfml_file[4] + ((build_config.build_type == Debug) ? "-d " : " ");
+    if(pic_config.use_network)
+        libraries += "-l" + sfml_file[4] + ((build_type == Debug) ? "-d " : " ");
 
-    if(build_config.build_type == Release)
+    if(build_type == Release)
         libraries += no_cmd_library;
 
-    command += "-L" + build_config.sfml_path.string() + "/lib ^ " + libraries;
+    command += "-L" + pic_config.sfml_path.string() + "/lib ^ " + libraries;
     
     if(system(command.c_str()) != 0) 
     {
@@ -255,9 +175,9 @@ bool BuildProject(const BuildConfig &build_config)
     return true;
 }
 
-void WorkBuildDirectory(const BuildConfig &build_config)
+void WorkBuildDirectory(const PicConfig &pic_config, BuildType build_type)
 {   
-    std::filesystem::path to = build_config.project_path / build_directory[build_config.build_type];
+    std::filesystem::path to = project_path / build_directory[build_type];
 
     for(const auto &entry : std::filesystem::directory_iterator(to))
     {
@@ -267,88 +187,86 @@ void WorkBuildDirectory(const BuildConfig &build_config)
 
     for(int i = 0; i < sfml_file.size(); i++)
     {
-        if(i == 3 && !build_config.use_audio) continue;
-        if(i == 4 && !build_config.use_network) continue; 
+        if(i == 3 && !pic_config.use_audio) continue;
+        if(i == 4 && !pic_config.use_network) continue; 
 
-        std::string binary = sfml_file[i] + ((build_config.build_type == Debug) ? "-d-" : "-") + std::to_string(build_config.sfml_version[0]) + ".dll"; 
+        std::string binary = sfml_file[i] + ((build_type == Debug) ? "-d-" : "-") + std::to_string(pic_config.sfml_version[0]) + ".dll"; 
 
-        std::filesystem::copy(build_config.sfml_path / "bin" / binary, to / binary);
+        std::filesystem::copy(pic_config.sfml_path / "bin" / binary, to / binary);
     }
 
     for(const auto &file : gcc_binary)
-        std::filesystem::copy(build_config.gcc_path / "bin" / file, to / file);
+        std::filesystem::copy(pic_config.gcc_path / "bin" / file, to / file);
 
-    for(const auto &path : build_config.binaries)
+    for(const auto &path : pic_config.binary)
         std::filesystem::copy(path, to / path.filename());
 
     if(std::filesystem::exists(to / "Resources")) std::filesystem::remove_all(to / "Resources");
 
-    std::filesystem::copy(build_config.project_path / "Resources", to / "Resources", std::filesystem::copy_options::recursive);
+    std::filesystem::copy(project_path / "Resources", to / "Resources", std::filesystem::copy_options::recursive);
 
     if(std::filesystem::exists(to / "icon.png")) std::filesystem::remove(to / "icon.png");
 
-    if(std::filesystem::exists(build_config.project_path / "icon.png")) 
-        std::filesystem::copy(build_config.project_path / "icon.png", to / "icon.png");
+    if(std::filesystem::exists(project_path / "icon.png")) 
+        std::filesystem::copy(project_path / "icon.png", to / "icon.png");
 }
 
-void CleanProject(const BuildConfig &build_config)
+void CleanProject(const PicConfig &pic_config)
 {
-    std::filesystem::remove(build_config.project_path / WINDOWS_ICON);
-    std::filesystem::remove(build_config.project_path / (WINDOWS_RESOURCE_NAME + ".rc"));
-    std::filesystem::remove(build_config.project_path / (WINDOWS_RESOURCE_NAME + ".o"));
-    std::filesystem::remove(build_config.project_path / (build_config.main_source.stem().string() + ".o"));
+    std::filesystem::remove(project_path / WINDOWS_ICON);
+    std::filesystem::remove(project_path / (WINDOWS_RESOURCE_NAME + ".rc"));
+    std::filesystem::remove(project_path / (WINDOWS_RESOURCE_NAME + ".o"));
+    std::filesystem::remove(project_path / (std::filesystem::path(pic_config.main).stem().string() + ".o"));
 }
 
-bool BuildOption(BuildConfig &build_config)
+bool BuildOption(BuildType build_type)
 {
-    json project_config;
+    PicConfig pic_config;
 
-    if(!GetConfigJSON(build_config.project_path / PROJECT_CONFIG, project_config)) return 1;
+    if(!std::filesystem::exists(project_path / build_directory[build_type]))
+        std::filesystem::create_directories(project_path / build_directory[build_type]);
 
-    if(!std::filesystem::exists(build_config.project_path / build_directory[build_config.build_type]))
-        std::filesystem::create_directories(build_config.project_path / build_directory[build_config.build_type]);
-
-    if(!GetBuildConfigData(project_config, build_config))
+    if(!GetPicSFMLConfig(pic_config, project_path))
         return false;
 
-    std::cout << "Building PicSFML project '" + build_config.project_name + "'\n";
-    std::cout << "BuildType: " + std::string((build_config.build_type == Debug) ? "Debug" : "Release") + "\n";
-    std::cout << "BuildVersion: " + build_config.application_version.AsString('.') << "\n";
-    std::cout << "Building for " + sfml_versions.at(build_config.sfml_version.AsInt()) + "\n";
+    std::cout << "Building PicSFML project '" + pic_config.name + "'\n";
+    std::cout << "BuildType: " + std::string((build_type == Debug) ? "Debug" : "Release") + "\n";
+    std::cout << "BuildVersion: " + pic_config.application_version.AsString('.') << "\n";
+    std::cout << "Building for " + SFMLCoreVersions().at(pic_config.sfml_version.AsInt()) + "\n";
     
-    if(!CreateWindowsIcon(build_config))
+    if(!CreateWindowsIcon(pic_config))
     {
         std::cout << "Aborting...\n";
-        CleanProject(build_config);
+        CleanProject(pic_config);
         return false;
     }
 
-    CreateWindowsResource(build_config);
+    CreateWindowsResource(pic_config);
 
-    if(!CompileWindowsResource(build_config))
+    if(!CompileWindowsResource(pic_config))
     {
         std::cout << "Aborting...\n";
-        CleanProject(build_config);
+        CleanProject(pic_config);
         return false;
     }
 
-    if(!CompileProject(build_config))
+    if(!CompileProject(pic_config))
     {
         std::cout << "Aborting...\n";
-        CleanProject(build_config);
+        CleanProject(pic_config);
         return false;
     }
 
-    if(!BuildProject(build_config))
+    if(!BuildProject(pic_config, build_type))
     {
         std::cout << "Aborting...\n";
-        CleanProject(build_config);
+        CleanProject(pic_config);
         return false;
     }
 
-    WorkBuildDirectory(build_config);
+    WorkBuildDirectory(pic_config, build_type);
 
-    CleanProject(build_config);
+    CleanProject(pic_config);
 
     std::cout << "Sucessful\n";
 
