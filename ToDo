@@ -2,7 +2,11 @@ Add the posibility to add resources to the executable, like an icon, app version
 
 Add the posibility if there is an icon set for the program to be set automaticaly. DONE
 
-Add posibility to recreate, or update an existing .picsfml config file.
+Add posibility to recreate, or update an existing .picsfml config file. DONE
+
+Add a option to list all the values from the config file.
+
+Make it posible to update an existing config file for newer picsfml versions. 
 
 Add in the SFML framework a way to set the SFML window, like a settings struct. DONE
 
