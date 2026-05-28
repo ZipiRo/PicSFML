@@ -29,6 +29,7 @@ Designed primarily for fast prototyping, learning projects, and lightweight game
 * Automatic application icon setup
 * Application version metadata support
 * Console configuration editing
+* Project congiguration list in console
 
 ---
 
@@ -136,6 +137,47 @@ picsfml -b . -d
 
 ```bash
 picsfml -b . -r
+```
+
+---
+
+# List Project Configuration
+
+```bash
+picsfml -l <path>
+```
+
+or
+
+```bash
+picsfml --list <path>
+```
+
+## Create Arguments
+
+| Argument                         | Description                       |
+| ---------------------------------| --------------------------------- |
+| `--all`                          | Show all the information          |
+| `-n`, `--name`                   | Show project name                 |
+| `-o`, `--output`                 | Show project output               |
+| `-m`, `--main`                   | Show main file                    |
+| `-g`, `--gcc`                    | Show GCC path                     |
+| `-s`, `--sfml`                   | Show SFML path                    |
+| `-sv`, `--sfml_version`          | Show SFML version                 |
+| `-av`, `--application_version`   | Show application version          |
+| `-l`, `--library`                | Show project libraries            |
+| `-i`, `--include`                | Show project include              |
+| `-b`, `--binary`                 | Show project binaries             |
+| `-df`, `--debug_flags`           | Show debug build flags            |
+| `-rf`, `--release_flags`         | Show release build flags          |
+| `--vscode`                       | Show using VSCode check           |
+| `--audio`                        | Show using audio check            |
+| `--network`                      | Show using network check          |
+
+## Example
+
+```bash
+picsfml -l . -all
 ```
 
 ---

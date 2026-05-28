@@ -22,8 +22,8 @@ bool CreateOption(const PicConfig &pic_config)
         return false;
     }
 
-    std::cout << "Creating PicSFML project '" + pic_config.name + "'\n";
-    std::cout << "SFML version " + SFMLCoreVersions().at(pic_config.sfml_version.AsInt()) + "\n";
+    std::cout << "Creating PicSFML project '" + pic_config.name + '\n';
+    std::cout << "SFML version " + SFMLCoreVersions().at(pic_config.sfml_version.AsInt()) + '\n';
 
     CopyApplicationBase(pic_config);
     

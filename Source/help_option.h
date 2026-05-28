@@ -34,25 +34,18 @@ void HelpOption()
     std::cout << "  Arguments:\n";
     std::cout << "      -n,  --name\n";
     std::cout << "              --set <string>          Set project name\n";
-    std::cout << "              --clear                 Clear project name\n";
     std::cout << "      -o,  --output\n";   
     std::cout << "              --set <string>          Set output executable name\n";
-    std::cout << "              --clear                 Clear output name\n";
     std::cout << "      -m,  --main\n"; 
     std::cout << "              --set <string>          Set main source file\n";
-    std::cout << "              --clear                 Clear main source file\n";
     std::cout << "      -g,  --gcc\n";  
     std::cout << "              --set <string>          Set GCC/MinGW path\n";
-    std::cout << "              --clear                 Clear GCC path\n";
     std::cout << "      -s,  --sfml\n"; 
     std::cout << "              --set <string>          Set SFML path\n";
-    std::cout << "              --clear                 Clear SFML path\n";
     std::cout << "      -sv, --sfml_version\n"; 
     std::cout << "              --set <string>          Set SFML version\n";
-    std::cout << "              --clear                 Reset SFML version\n";
     std::cout << "      -av, --application_version\n";
     std::cout << "              --set <string>          Set application version\n";
-    std::cout << "              --clear                 Reset application version\n";
     std::cout << "      -l,  --library\n";  
     std::cout << "              --add <string>          Add library\n";
     std::cout << "              --remove <string>       Remove library\n";
@@ -85,11 +78,33 @@ void HelpOption()
     std::cout << "              --false                 Disable SFML network module\n";
     std::cout << '\n';
     
+    std::cout << "  -l, --list       Show '.picsfml_config' information\n";
+    std::cout << "  Arguments:\n";
+    std::cout << "      --all                           Show all the information\n";
+    std::cout << "      -n,  --name                     Show the project name\n";
+    std::cout << "      -o,  --output                   Show the project output\n";   
+    std::cout << "      -m,  --main                     Show the main file\n"; 
+    std::cout << "      -g,  --gcc                      Show the gcc path\n";  
+    std::cout << "      -s,  --sfml                     Show the sfml path\n"; 
+    std::cout << "      -sv, --sfml_version             Show the sfml version\n"; 
+    std::cout << "      -av, --application_version      Show the application version\n";
+    std::cout << "      -l,  --library                  Show the project libraries\n";  
+    std::cout << "      -i,  --include                  Show the project include\n";  
+    std::cout << "      -b,  --binary                   Show the project binaries\n";   
+    std::cout << "      -df, --debug_flags              Show debug build flags\n";  
+    std::cout << "      -rf, --release_flags            Show release build flags\n";    
+    std::cout << "      --vscode                        Show using VSCode check\n";    
+    std::cout << "      --audio                         Show using audio check\n"; 
+    std::cout << "      --network                       Show using network check\n";   
+    std::cout << '\n';
+
     std::cout << "  -h, --help                          Show help\n";
     std::cout << "  -v, --version                       Show version\n";
+    std::cout << '\n';
 
     std::cout << "Examples:\n";
-    std::cout << "picsfml --create dir --gcc \"C:/mingw64\" --sfml \"C:SFML-3.0.0\" --vscode\n";
-    std::cout << "picsfml --build dir --debug";
-    std::cout << "picsfml --set dir --libaray --remove --front";
+    std::cout << "  picsfml --create <path> --gcc \"C:/mingw64\" --sfml \"C:SFML-3.0.0\" --vscode\n";
+    std::cout << "  picsfml --build <path> --debug\n";
+    std::cout << "  picsfml --set <path> --libaray --remove --front\n";
+    std::cout << "  picsfml --list <path> --all\n";
 }
