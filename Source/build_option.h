@@ -229,10 +229,10 @@ bool BuildOption(BuildType build_type)
     if(!GetPicSFMLConfig(pic_config, project_path))
         return false;
 
-    std::cout << "Building PicSFML project '" + pic_config.name + "'\n";
-    std::cout << "BuildType: " + std::string((build_type == Debug) ? "Debug" : "Release") + "\n";
-    std::cout << "BuildVersion: " + pic_config.application_version.AsString('.') << "\n";
-    std::cout << "Building for " + SFMLCoreVersions().at(pic_config.sfml_version.AsInt()) + "\n";
+    std::cout << "Building PicSFML project '" + pic_config.name + '\n';
+    std::cout << "BuildType: " + std::string((build_type == Debug) ? "Debug" : "Release") + '\n';
+    std::cout << "BuildVersion: " + pic_config.application_version.AsString('.') << '\n';
+    std::cout << "Building for " + SFMLCoreVersions().at(pic_config.sfml_version.AsInt()) + '\n';
     
     if(!CreateWindowsIcon(pic_config))
     {

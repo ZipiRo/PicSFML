@@ -26,7 +26,7 @@
     include paths, binaries, and additional configuration.
 
     Author: ZipiRo
-    Version: 1.1.2
+    Version: 1.2.0
     ============================================================
 */
 
@@ -66,11 +66,12 @@ enum Option
     Build,
     Create,
     Set,
+    List,
     Help,
     ShowVersion
 };
 
-const PVersion PICSFML_VERSION = PVersion("1.1.2");
+const PVersion PICSFML_VERSION = PVersion("1.2.0");
 const std::string PROJECT_CONFIG = ".picsfml_config";
 const std::string VSC_CONFIG = "c_cpp_properties.json";
 const std::string APPLICATION_ICON = "icon.png";
@@ -78,6 +79,20 @@ const std::string WINDOWS_ICON = "icon.ico";
 const std::string WINDOWS_RESOURCE_NAME = "resource";
 const std::filesystem::path picsfml_path = Win32::GetLocalPath().parent_path();
 std::filesystem::path project_path;
+
+template <typename T>
+void PrintList(const std::vector<T> &vector, const std::string &name)
+{
+    std::cout << name << " (" << vector.size() << "):\n";
+    if(vector.empty())
+    {
+        std::cout << " Empty\n";
+        return;
+    }
+
+    for(int i = 0; i < vector.size(); i++)
+        std::cout << " [" << i << "] " << vector[i] << '\n';
+}
 
 bool RemovePath(std::vector<std::filesystem::path> &paths, const std::string &path)
 {
@@ -171,66 +186,18 @@ bool GetPicSFMLConfig(PicConfig &pic_config, const std::filesystem::path &path)
     pic_config.flags[Debug] = project_config["build"]["debug"]["flags"];
     pic_config.flags[Release] = project_config["build"]["release"]["flags"];
     pic_config.use_vscode = project_config.value("use_vscode", false);
-
-    if(!std::filesystem::exists(project_config["project"]["gcc"]))
-    {
-        std::cout << "GCC path "  << project_config["project"]["gcc"] << " not found\n";
-        return false;
-    } 
     pic_config.gcc_path = std::string(project_config["project"]["gcc"]);
-
-    if(!std::filesystem::exists(project_config["project"]["sfml"]))
-    {
-        std::cout << "SFML path "  << project_config["project"]["sfml"] << " not found\n";
-        return false;
-    } 
     pic_config.sfml_path = std::string(project_config["project"]["sfml"]);
-
-    if(!std::filesystem::exists(path / project_config["project"]["main"]))
-    {
-        std::cout << "Main file "  << project_config["project"]["main"] << " not found\n";
-        return false;
-    } 
     pic_config.main = project_config["project"]["main"];
 
     for(const auto &binary : project_config["binary"])
-    {
-        if(!std::filesystem::exists(binary) && binary.empty()) 
-        {
-            std::cout << "File " << binary << " not found\n";
-            return false;
-        }   
-
         pic_config.binary.push_back(binary);
-    }
 
     for(const auto &include : project_config["include"])
-    {
-        if(!std::filesystem::exists(include) && include.empty()) 
-        {
-            std::cout << "Include " << include << " not found\n";
-            return false;
-        }   
-
         pic_config.include.push_back(include);  
-    }
 
     for(const auto &library : project_config["library"])
-    {
-        if(std::string(library)[0] == '-')
-        {
-            pic_config.library.push_back(library);
-            continue;
-        }
-
-        if(!std::filesystem::exists(library)) 
-        {
-            std::cout << "Library " << library << " not found\n";
-            return false;
-        }   
-        
         pic_config.library.push_back(library);
-    }
 
     return true;
 }
@@ -350,6 +317,7 @@ int main(int argc, char** argv)
     if(flag == "-b" || flag == "--build") option = Build;
     else if(flag == "-c" || flag == "--create") option = Create;
     else if(flag == "-s" || flag == "--set") option = Set;
+    else if(flag == "-l" || flag == "--list") option = List;
     else if(flag == "-h" || flag == "--help") 
     {
         HelpOption();
@@ -383,7 +351,7 @@ int main(int argc, char** argv)
     }
     else project_path = std::filesystem::absolute(project_path);
 
-    if(option == Set) GetPicSFMLConfig(pic_config, project_path);
+    if(option == Set || option == List) GetPicSFMLConfig(pic_config, project_path);
 
     BuildType build_type = Release;
 
@@ -394,6 +362,7 @@ int main(int argc, char** argv)
         switch (option)
         {
         case Build:
+        { 
             if(flag == "-r" || flag == "--release")
             {    
                 build_type = Release;
@@ -404,7 +373,9 @@ int main(int argc, char** argv)
             }
             else FlagNotExistent(flag);
             break;
+        }
         case Create:
+        {
             if(flag == "-n" || flag == "--name")
             {
                 std::string arg(argv[index++]);
@@ -451,7 +422,9 @@ int main(int argc, char** argv)
             }
             else FlagNotExistent(flag);
             break;
+        }
         case Set:
+        {
             if(flag == "-n" || flag == "--name")
             {
                 std::string arg(argv[index++]);
@@ -460,10 +433,6 @@ int main(int argc, char** argv)
                 {
                     arg = argv[index++];
                     pic_config.name = arg;
-                }
-                else if(arg == "--clear")
-                {
-                    pic_config.name = "";
                 }
                 else FlagNotExistent(arg);
             }
@@ -476,10 +445,6 @@ int main(int argc, char** argv)
                     arg = argv[index++];
                     pic_config.output = arg;
                 }
-                else if(arg == "--clear")
-                {
-                    pic_config.output = "";
-                }
                 else FlagNotExistent(arg);
             }
             else if(flag == "-g" || flag == "--gcc")
@@ -490,10 +455,6 @@ int main(int argc, char** argv)
                 {
                     arg = argv[index++];
                     pic_config.gcc_path = arg;
-                }
-                else if(arg == "--clear")
-                {
-                    pic_config.gcc_path = "";
                 }
                 else FlagNotExistent(arg);
             }
@@ -506,10 +467,6 @@ int main(int argc, char** argv)
                     arg = argv[index++];
                     pic_config.sfml_path = arg;
                 }
-                else if(arg == "--clear")
-                {
-                    pic_config.sfml_path = "";
-                }
                 else FlagNotExistent(arg);
             }
             else if(flag == "-m" || flag == "--main")
@@ -520,10 +477,6 @@ int main(int argc, char** argv)
                 {
                     arg = argv[index++];
                     pic_config.main = arg;
-                }
-                else if(arg == "--clear")
-                {
-                    pic_config.main = "";
                 }
                 else FlagNotExistent(arg);
             }
@@ -538,10 +491,6 @@ int main(int argc, char** argv)
                     if(!CheckSFMLVersion(sfml_version)) return 1;
                     pic_config.sfml_version = sfml_version;
                 }
-                else if(arg == "--clear")
-                {
-                    pic_config.sfml_version = PVersion("0");
-                }
                 else FlagNotExistent(arg);
             }
             else if(flag == "-av" || flag == "--application_version")
@@ -553,10 +502,6 @@ int main(int argc, char** argv)
                     arg = argv[index++];
                     PVersion application_version(arg);
                     pic_config.application_version = application_version;
-                }
-                else if(arg == "--clear")
-                {
-                    pic_config.application_version = PVersion("0.0.0.0");
                 }
                 else FlagNotExistent(arg);
             }
@@ -688,6 +633,90 @@ int main(int argc, char** argv)
             }
             else FlagNotExistent(flag);
             break;
+        }
+        case List:
+        {
+            if(flag == "--all")
+            {
+                std::cout << "Project Name: " << pic_config.name << '\n';
+                std::cout << "Project Output: " << pic_config.output << '\n';
+                std::cout << "GCC Path: " << pic_config.gcc_path << '\n';
+                std::cout << "SFML Path: " << pic_config.sfml_path << '\n'; 
+                std::cout << "Main: " << pic_config.main << '\n';
+                std::cout << "SFML Version: " << pic_config.sfml_version.AsString('.') << '\n';
+                std::cout << "Application Version: " << pic_config.application_version.AsString('.') << '\n';
+                PrintList(pic_config.library, "Library Paths");
+                PrintList(pic_config.include, "Include Paths");
+                PrintList(pic_config.binary, "Binary Paths");
+                std::cout << "Debug Flags: " << pic_config.flags[Debug] << '\n';
+                std::cout << "Release Flags: " << pic_config.flags[Release] << '\n';
+                std::cout << "Using VSCode: " << (pic_config.use_vscode ? "True" : "False") << '\n';
+                std::cout << "Using Audio: " << (pic_config.use_audio  ? "True" : "False") << '\n';
+                std::cout << "Using Network: " << (pic_config.use_network ? "True" : "False") << '\n';
+            }
+            else if(flag == "-n" || flag == "--name")
+            {
+                std::cout << "Project Name: " << pic_config.name << '\n';
+            }
+            else if(flag == "-o" || flag == "--output")
+            {
+                std::cout << "Project Output: " << pic_config.output << '\n';
+            }
+            else if(flag == "-g" || flag == "--gcc")
+            {
+                std::cout << "GCC Path: " << pic_config.gcc_path << '\n';
+            }
+            else if(flag == "-s" || flag == "--sfml")
+            {
+                std::cout << "SFML Path: " << pic_config.sfml_path << '\n'; 
+            }
+            else if(flag == "-m" || flag == "--main")
+            {
+                std::cout << "Main: " << pic_config.main << '\n';
+            }
+            else if(flag == "-sv" || flag == "--sfml_version")
+            {
+                std::cout << "SFML Version: " << pic_config.sfml_version.AsString('.') << '\n';
+            }
+            else if(flag == "-av" || flag == "--application_version")
+            {  
+                std::cout << "Application Version: " << pic_config.application_version.AsString('.') << '\n';
+            }
+            else if(flag == "-l" || flag == "--library")
+            {   
+                PrintList(pic_config.library, "Library Paths");
+            }
+            else if(flag == "-i" || flag == "--include")
+            {
+                PrintList(pic_config.include, "Include Paths");
+            }
+            else if(flag == "-b" || flag == "--binary")
+            {
+                PrintList(pic_config.binary, "Binary Paths");
+            }
+            else if(flag == "-df" || flag == "--debug_flags")
+            {
+                std::cout << "Debug Flags: " << pic_config.flags[Debug] << '\n';
+            }
+            else if(flag == "-rf" || flag == "--release_flags")
+            {
+                std::cout << "Release Flags: " << pic_config.flags[Release] << '\n';
+            }
+            else if(flag == "--vscode")
+            {
+                std::cout << "Using VSCode: " << (pic_config.use_vscode ? "True" : "False") << '\n';
+            }
+            else if(flag == "--audio")
+            {
+                std::cout << "Using Audio: " << (pic_config.use_audio  ? "True" : "False") << '\n';
+            }
+            else if(flag == "--network")
+            {
+                std::cout << "Using Network: " << (pic_config.use_network ? "True" : "False") << '\n';
+            }
+            else FlagNotExistent(flag);
+            break;
+        }
         default:
             break;
         }
