@@ -26,7 +26,7 @@
     include paths, binaries, and additional configuration.
 
     Author: ZipiRo
-    Version: 1.1.1
+    Version: 1.1.2
     ============================================================
 */
 
@@ -70,7 +70,7 @@ enum Option
     ShowVersion
 };
 
-const PVersion PICSFML_VERSION = PVersion("1.1.1");
+const PVersion PICSFML_VERSION = PVersion("1.1.2");
 const std::string PROJECT_CONFIG = ".picsfml_config";
 const std::string VSC_CONFIG = "c_cpp_properties.json";
 const std::string APPLICATION_ICON = "icon.png";
