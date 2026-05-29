@@ -19,3 +19,5 @@ Change the argument -g, --gcc to -c, --compiler becasue that makes more sense.
 Despart the part wherer the args are read in other header files for better code structure
 
 Check if the file paths exist.
+
+Make a defaults file for easier project creation.

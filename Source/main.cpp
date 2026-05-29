@@ -49,7 +49,7 @@ namespace Win32
     std::filesystem::path GetLocalPath()
     {
         char buffer[256];
-        Win32::GetModuleFileNameA(NULL, buffer, 256);
+        GetModuleFileNameA(NULL, buffer, 256);
         return std::filesystem::path(buffer);
     }
 }
