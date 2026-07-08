@@ -1,6 +1,6 @@
 *.exe
+*.json
+*.tooldefaults
+*.vscode
 *.bat
-*.o
-
-.vscode
-_internal
+/_internal
