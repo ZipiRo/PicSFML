@@ -2,7 +2,7 @@
     <img src="Template/icon.png" width="170">
 </p>
 
-<h1 align="center">PicSFML</h1>
+<h1 align="center">PicSFML v2</h1>
 
 <p align="center">
 A lightweight toolkit for creating, configuring and building SFML projects.
