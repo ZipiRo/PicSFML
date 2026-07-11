@@ -824,7 +824,7 @@ bool VersionCommand(const ParsedCommand &parsed_command)
     std::cout << "Created to simplify SFML project creation, and makeing it easier with including code\n";
     std::cout << "and linking libraryes for any other things you want to add to your project.\n";
     std::cout << "Surely works with SFML-2.6.2, SFML-3.0.0, more in the future.\n";
-    std::cout << "Created on 05/05/2026 and Last Updated 07/08/2026.\n";
+    std::cout << "Created on 05/05/2026 and Last Updated 07/11/2026.\n";
     std::cout << "PicSFML Version " << PicSFML::PicSFMLVersion.AsString('.') << "\n";
 
     return true;

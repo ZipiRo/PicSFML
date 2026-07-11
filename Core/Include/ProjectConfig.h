@@ -2,7 +2,7 @@ namespace PicSFML
 {
     const std::string PicConfigFileName = ".picsfml";
 
-    const Version PicSFMLVersion = Version("2.0.0");
+    const Version PicSFMLVersion = Version("2.0.1");
     
     struct ProjectConfig
     {
