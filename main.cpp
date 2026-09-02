@@ -407,7 +407,7 @@ void HelpCommand(const std::vector<ParsedCommand::Option> &options)
     }
 
     PicSFML::Debug::Message("");
-    PicSFML::Debug::Message("Run 'picsfml help <command>' for details on a specific command.");
+    PicSFML::Debug::Message("Run 'picsfml help --command <command>' for details on a specific command.");
     PicSFML::Debug::Message("");
 }
 
