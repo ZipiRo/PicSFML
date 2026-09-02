@@ -1,8 +1,8 @@
 <p align="center">
-    <img src="Template/icon.png" width="170">
+    <img src="Template/SFML-3.0.0/icon.png" width="170">
 </p>
 
-<h1 align="center">PicSFML v2</h1>
+<h1 align="center">PicSFML v3</h1>
 
 <p align="center">
 A lightweight toolkit for creating, configuring and building SFML projects.
@@ -23,9 +23,8 @@ Creating a new SFML project usually requires configuring include directories, li
 With PicSFML, creating and building a project can be as simple as:
 
 ```bash
-picsfml create default MyProject
-cd MyProject
-picsfml build . release
+picsfml create --name MyProject
+picsfml build MyProject --release
 ```
 
 A graphical interface is currently under development and will provide the same functionality without requiring the command line.
@@ -42,19 +41,35 @@ It combines a project generator, build system and lightweight framework into a s
 
 ---
 
+# What's New in v3
+
+PicSFML v3 is a rewrite of the command-line interface and configuration system.
+
+- **New flag-based CLI.** Commands are now built around `--option value` flags instead of fixed positional arguments (`picsfml create --name MyProject` instead of `picsfml create default MyProject`).
+- **Settings and Defaults are now separate.** Machine-wide behavior (like where projects are created) lives under `picsfml settings`, while the values every new project should inherit (compiler, SFML path/version, output name, VS Code files) live under `picsfml defaults`.
+- **List fields in project configs.** `include_directories`, `library_files` and `binary_files` can be read, set by index, added to and removed from directly via `picsfml config`.
+- **`create-config` command.** Generate a default `.picsfml_config` for a project directory that doesn't have one yet.
+- **JSON-based configuration files.** Project configs and defaults are now stored as JSON instead of plain `key = value` text.
+- **Global debug flags.** `--verbose` and `--normal` (in addition to a per-machine `debug_mode` setting) control how much PicSFML logs while it runs.
+- **Reorganized generated project.** User code now lives in its own `Code/` folder, separate from the `PicSFML/` framework folder.
+- **`interface` command reserved.** A stub command for the upcoming graphical interface.
+
+---
+
 # Features
 
 - Create fully configured SFML projects.
 - Build projects in Debug or Release mode.
 - Configure projects entirely from the command line.
 - Global default settings shared between every project.
-- Restore project settings back to their default values.
+- Machine-wide settings, separate from per-project defaults.
 - Support for multiple SFML versions.
 - Optional Visual Studio Code integration.
 - Optional SFML Audio module.
 - Optional SFML Network module.
-- Multiple source, include, library and binary files.
+- Multiple source, include, library and binary files, editable as list fields.
 - Lightweight project structure.
+- Verbose / normal / quiet logging modes.
 - Graphical interface (Coming Soon).
 
 ---
@@ -69,15 +84,16 @@ The framework currently includes:
 
 ## Application Class
 
-The generated project includes an `Application` class that manages:
+The generated project includes a `MainApplication` class (in `Code/MainApplication.hpp`) that derives from `PicSFML::Application` and manages:
 
 - Window creation
 - Main game loop
 - Event processing
 - Update loop
-- Rendering loop
+- World and canvas rendering passes
+- Shutdown
 
-The generated `main.cpp` already creates and runs this class, allowing you to begin development immediately.
+Override `Start`, `Update`, `Events`, `DrawWorld`, `DrawCanvas` and `End` to build your application. The generated `main.cpp` already creates and runs this class, allowing you to begin development immediately.
 
 ## Resource Manager
 
@@ -122,15 +138,15 @@ Both classes simplify playback and resource management.
 
 Every generated project already contains:
 
-- Application class
-- Build directories
-- Resource directory
-- Project configuration
+- `MainApplication` class and user code folder
+- `PicSFML` framework folder (Application, Input, ResourceManager, SoundPlayer, MusicPlayer)
+- Resources subfolders for Textures, Fonts, Shaders, Music and Audio
+- Project configuration (`.picsfml_config`)
 - Application icon
 
 allowing you to start writing your application immediately.
 
-Resources directory is the default location for textures, fonts, audio, project assets.
+---
 
 # Requirements
 
@@ -150,31 +166,31 @@ After installing them, simply configure their locations once using the `defaults
 Configure the compiler.
 
 ```bash
-picsfml defaults compiler set "C:/mingw64/bin/g++.exe"
+picsfml defaults --set compiler_dir_path="C:/mingw64/bin"
 ```
 
 Configure the SFML installation.
 
 ```bash
-picsfml defaults sfml set "C:/SFML-3.0.0"
+picsfml defaults --set sfml_dir_path="C:/SFML-3.0.0"
 ```
 
 Configure the SFML version.
 
 ```bash
-picsfml defaults sfml_version set 3.0.0
+picsfml defaults --set sfml_version=3.0.0
 ```
 
-Configure the default projects directory.
+Configure the default projects directory (this is a machine-wide **setting**, not a default — see [Defaults vs Settings](#defaults-vs-settings)).
 
 ```bash
-picsfml defaults projects_directory set "D:/Projects"
+picsfml settings --set projects_directory="D:/Projects"
 ```
 
 Once these values are configured, every new project created with
 
 ```bash
-picsfml create default MyProject
+picsfml create --name MyProject
 ```
 
 will automatically use them.
@@ -190,13 +206,13 @@ Each project must specify which version it targets so PicSFML knows which framew
 Configure it globally:
 
 ```bash
-picsfml defaults sfml_version set 3.0.0
+picsfml defaults --set sfml_version=3.0.0
 ```
 
 or for an existing project:
 
 ```bash
-picsfml config . sfml_version set 3.0.0
+picsfml config MyProject --set sfml_version=3.0.0
 ```
 
 Currently supported versions:
@@ -210,16 +226,22 @@ If no SFML version is configured, PicSFML cannot determine which version of SFML
 
 # Creating Projects
 
-Create a project at a specific location.
+Create a project inside your configured default projects directory.
 
 ```bash
-picsfml create "D:/Projects/MyGame" MyProejct
+picsfml create --name MyProject
 ```
 
-or create it inside your configured default projects directory.
+Create a project at a specific location instead.
 
 ```bash
-picsfml create default MyProject
+picsfml create --name MyProject --path "D:/Projects/MyProject"
+```
+
+Override any default for just this project while creating it.
+
+```bash
+picsfml create --name MyProject --output MyGame --sfml_version 2.6.2 --vscode
 ```
 
 If your default projects directory is
@@ -231,7 +253,7 @@ D:/Projects
 then
 
 ```bash
-picsfml create default MyProject
+picsfml create --name MyProject
 ```
 
 creates
@@ -241,26 +263,32 @@ D:/Projects/
 └── MyProject/
 ```
 
+If a project directory already has source files but no PicSFML configuration, generate one with:
+
+```bash
+picsfml create-config MyProject
+```
+
 ---
 
 # Building Projects
 
-Build the current project.
+Build the current project in Debug mode (default).
 
 ```bash
-picsfml build .
+picsfml build MyProject
 ```
 
 Build a Release executable.
 
 ```bash
-picsfml build . release
+picsfml build MyProject --release
 ```
 
-Build a Debug executable.
+Build a Debug executable explicitly.
 
 ```bash
-picsfml build . debug
+picsfml build MyProject --debug
 ```
 
 ---
@@ -272,139 +300,176 @@ Project settings are modified using the `config` command.
 Show every configuration value.
 
 ```bash
-picsfml config . list
+picsfml config MyProject --show
 ```
 
-Get the compiler path.
+Get a field.
 
 ```bash
-picsfml config . compiler get
+picsfml config MyProject --get compiler_dir_path
 ```
 
-Change the compiler.
+Set a field.
 
 ```bash
-picsfml config . compiler set "C:/mingw64/bin/g++.exe"
+picsfml config MyProject --set compiler_dir_path="C:/mingw64/bin"
 ```
 
-Restore the default compiler.
+You can also reset a project field to the value defined in the global defaults by using `default` as the value:
 
 ```bash
-picsfml config . compiler default
+picsfml config MyProject --set compiler_dir_path=default
 ```
 
-Any property that supports the `default` command can be restored to the value configured through the `defaults` command.
+This reads the current value of `compiler_dir_path` from the global defaults and applies it to the project.
+
+List fields (`include_directories`, `library_files`, `binary_files`) support a few extra operations:
+
+Add an entry.
+
+```bash
+picsfml config MyProject --add library_files="-lopengl32"
+```
+
+Remove an entry by value.
+
+```bash
+picsfml config MyProject --remove library_files="-lopengl32"
+```
+
+Get the entry at a specific index.
+
+```bash
+picsfml config MyProject --get "include_directories[0]"
+```
+
+Set the entry at a specific index.
+
+```bash
+picsfml config MyProject --set "include_directories[0]=C:/Libs/include"
+```
 
 ---
 
-# Global Defaults
+# Defaults vs Settings
 
-The `defaults` command configures the values that every newly created project will inherit.
+PicSFML v3 splits global configuration into two separate concepts:
+
+- **`defaults`** — the values every newly created project inherits (compiler, SFML path/version, output name, VS Code generation). Changed with the `defaults` command, per-project with `config`.
+- **`settings`** — machine-wide behavior that isn't tied to any single project, such as where new projects are created and how verbose PicSFML's logging is. Changed with the `settings` command.
+
+```text
+              settings                       defaults
+                  │                               │
+     (where to create projects,        (what a new project inherits)
+        how verbose to log)                       │
+                  │                    ┌───────────┴───────────┐
+                  │                    │                       │
+                  │              create --name A         create --name B
+                  │                    │                       │
+                  └──────► used by     Project A              Project B
+                       "create" to           │                       │
+                       resolve the      config modifies       config modifies
+                       target folder     only Project A         only Project B
+```
+
+## Global Defaults
 
 View every default value.
 
 ```bash
-picsfml defaults list
+picsfml defaults --show
 ```
 
-Change the compiler.
+Get a default.
 
 ```bash
-picsfml defaults compiler set "C:/mingw64/bin/g++.exe"
+picsfml defaults --get sfml_version
+```
+
+Change the compiler directory.
+
+```bash
+picsfml defaults --set compiler_dir_path="C:/mingw64/bin"
 ```
 
 Change the SFML installation.
 
 ```bash
-picsfml defaults sfml set "C:/SFML-3.0.0"
+picsfml defaults --set sfml_dir_path="C:/SFML-3.0.0"
 ```
 
 Change the default SFML version.
 
 ```bash
-picsfml defaults sfml_version set 3.0.0
-```
-
-Change the default projects directory.
-
-```bash
-picsfml defaults projects_directory set "D:/Projects"
-```
-
-Change the default main file name.
-
-```bash
-picsfml defaults main set "main.cpp"
+picsfml defaults --set sfml_version=3.0.0
 ```
 
 Change the default output file name.
 
 ```bash
-picsfml defaults output set "MPGrid"
+picsfml defaults --set output_name=MyGame
 ```
 
-Change the default build flags debug or release.
+Change whether VS Code files are generated by default.
 
 ```bash
-picsfml defaults flags debug set "-g"
+picsfml defaults --set create_vscode_files=true
 ```
 
----
+## Global Settings
 
-# Default Values vs Project Values
+View every setting.
 
-The `defaults` command changes the global configuration.
+```bash
+picsfml settings --show
+```
 
-The `config` command changes only the current project.
+Change the default projects directory.
 
-```text
-                defaults
-                    │
-                    │
-        ┌───────────┴───────────┐
-        │                       │
- create default A         reate default B
-        │                       │
-     Project A              Project B
-        │                       │
-   config modifies        config modifies
-    only Project A         only Project B
+```bash
+picsfml settings --set projects_directory="D:/Projects"
+```
+
+Change the logging verbosity (`quiet`, `normal`, `verbose`).
+
+```bash
+picsfml settings --set debug_mode=verbose
 ```
 
 ---
 
 # Configurable Project Properties
 
-The following properties can be modified inside a project.
+The following properties can be modified inside a project with `picsfml config <project> --set field=value` (or `--add` / `--remove` / `--get` for the list fields).
 
 | Property | Description |
 |----------|-------------|
-| `name` | Project name |
-| `compiler` | Compiler executable |
-| `sfml` | SFML installation path |
+| `project_name` | Project name |
+| `description` | Project description |
+| `output_name` | Output executable name |
+| `compiler_dir_path` | Compiler directory path |
+| `sfml_dir_path` | SFML installation path |
 | `sfml_version` | Version of SFML used by the project |
 | `app_version` | Application version |
-| `output` | Output executable name |
-| `main` | Main source file |
-| `source` | Additional source files |
-| `include` | Additional include files |
-| `library` | Additional library files |
-| `binary` | Additional binary/DLL files |
-| `flags debug` | Debug compiler flags |
-| `flags release` | Release compiler flags |
-| `vscode` | Generate Visual Studio Code configuration |
-| `audio` | Enable the SFML Audio module |
-| `network` | Enable the SFML Network module |
+| `debug_flags` | Debug compiler flags |
+| `release_flags` | Release compiler flags |
+| `create_vscode_files` | Generate Visual Studio Code configuration |
+| `use_sfml_audio` | Enable the SFML Audio module |
+| `use_sfml_network` | Enable the SFML Network module |
+| `include_directories[i]` | Additional include directories *(list)* |
+| `library_files[i]` | Additional library files *(list)* |
+| `binary_files[i]` | Additional binary/DLL files *(list)* |
 
 > **Note**
 >
-> `picsfml_version` is maintained internally by PicSFML and should not be modified manually.
+> `picsfml_version` and `date_created` are maintained internally by PicSFML and should not be modified manually.
 
 ---
 
-# The `.picsfml` File
+# The `.picsfml_config` File
 
-Every project contains a `.picsfml` configuration file.
+Every project contains a `.picsfml_config` file, stored as JSON.
 
 This file stores all project-specific settings used by PicSFML during project creation and building.
 
@@ -412,19 +477,26 @@ Although it can be edited manually, using the `config` command is recommended, a
 
 Example:
 
-```text
-name = MyProject
-
-compiler = C:/mingw64/bin/g++.exe
-sfml = C:/SFML-3.0.0
-sfml_version = 3.0.0
-
-output = MyProject
-main = main.cpp
-
-vscode = true
-audio = false
-network = false
+```json
+{
+    "project_name": "MyProject",
+    "description": "",
+    "output_name": "MyProject",
+    "compiler_dir_path": "C:/mingw64/bin",
+    "sfml_dir_path": "C:/SFML-3.0.0",
+    "sfml_version": "3.0.0",
+    "picsfml_version": "3.0.0",
+    "app_version": "1.0.0.0",
+    "debug_flags": "",
+    "release_flags": "",
+    "date_created": "02/09/2026 14:30",
+    "create_vscode_files": true,
+    "use_sfml_audio": false,
+    "use_sfml_network": false,
+    "include_directories": [],
+    "library_files": [],
+    "binary_files": []
+}
 ```
 
 ---
@@ -434,20 +506,33 @@ network = false
 Projects created by PicSFML look similar to:
 
 ```text
-MyPrject/
+MyProject/
 │
 ├── Build/
 │   ├── Debug/
 │   └── Release/
 │
-├── Include/
-│   └── App.h
+├── Code/
+│   └── MainApplication.hpp
+│
+├── PicSFML/
+│   ├── Application.hpp
+│   ├── Input.hpp
+│   ├── ResourceManager.hpp
+│   ├── SoundPlayer.hpp
+│   ├── SoundSettings.hpp
+│   └── MusicPlayer.hpp
 │
 ├── Resources/
+│   ├── Audio/
+│   ├── Fonts/
+│   ├── Music/
+│   ├── Shaders/
+│   └── Textures/
 │
 ├── icon.png
 ├── main.cpp
-└── .picsfml
+└── .picsfml_config
 ```
 
 ---
@@ -468,46 +553,84 @@ No additional configuration is required.
 
 ---
 
+# Logging
+
+PicSFML can run at three levels of verbosity:
+
+- `quiet` — only prints essential messages.
+- `normal` — default level, prints progress and errors.
+- `verbose` — prints detailed internal logging, useful for troubleshooting.
+
+Set it for a single command:
+
+```bash
+picsfml build MyProject --release --verbose
+```
+
+or persist it for every command via settings:
+
+```bash
+picsfml settings --set debug_mode=verbose
+```
+
+If a build or command fails, check the latest log file for details — its location is printed at the end of the failed command.
+
+---
+
 # Example Workflow
 
 Configure PicSFML.
 
 ```bash
-picsfml defaults compiler set "C:/mingw64/bin/g++.exe"
-picsfml defaults sfml set "C:/SFML-3.0.0"
-picsfml defaults sfml_version set 3.0.0
-picsfml defaults projects_directory set "D:/Projects"
+picsfml defaults --set compiler_dir_path="C:/mingw64/bin"
+picsfml defaults --set sfml_dir_path="C:/SFML-3.0.0"
+picsfml defaults --set sfml_version=3.0.0
+picsfml settings --set projects_directory="D:/Projects"
 ```
 
 Create a project.
 
 ```bash
-picsfml create default MyProject
-```
-
-Open the project.
-
-```bash
-cd MyProject
+picsfml create --name MyProject
 ```
 
 Build it.
 
 ```bash
-picsfml build . debug
+picsfml build MyProject --debug
 ```
 
 If you later decide to use another compiler for only this project:
 
 ```bash
-picsfml config . compiler set "D:/LLVM/bin/clang++.exe"
+picsfml config MyProject --set compiler_dir_path="D:/LLVM/bin"
 ```
 
-and later want to return to the default compiler:
+and later want to check every value it's currently using:
 
 ```bash
-picsfml config . compiler default
+picsfml config MyProject --show
 ```
+
+---
+
+# Command Reference
+
+| Command | Description |
+|---------|-------------|
+| `picsfml create --name <name> [options]` | Creates a new SFML project. |
+| `picsfml build <project_path> [--debug\|--release]` | Builds an existing project. |
+| `picsfml config <project_path> [options]` | Reads or modifies a project's configuration. |
+| `picsfml create-config <project_path>` | Creates a default configuration file for an existing project. |
+| `picsfml defaults [options]` | Reads or modifies the global project defaults used by `create`. |
+| `picsfml settings [options]` | Reads or modifies global PicSFML settings. |
+| `picsfml version` | Prints version and build information. |
+| `picsfml help [--command <command>]` | Prints general help, or detailed help for a specific command. |
+| `picsfml interface` | Opens the graphical interface of PicSFML *(coming soon)*. |
+
+Every command also accepts `--verbose`, `--normal` or `--quite` to override the logging level for that run.
+
+Run `picsfml help --command <command>` for a full option list on any command.
 
 ---
 
@@ -517,8 +640,9 @@ picsfml config . compiler default
 
 - [x] Project creation
 - [x] Debug and Release builds
-- [x] Project configuration
+- [x] Project configuration (including list fields)
 - [x] Global defaults
+- [x] Global settings
 - [x] VS Code integration
 - [x] Audio module support
 - [x] Network module support
