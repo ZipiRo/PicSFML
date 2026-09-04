@@ -33,14 +33,8 @@ const std::vector<std::string> compiler_binary = {
     "libstdc++-6.dll",
     "libwinpthread-1.dll",
     "libgcc_s_seh-1.dll"};
-
-struct CommandResult
-{
-    std::string output;
-    int exit_code;
-};
  
-CommandResult RunCommand(const std::string &command)
+PicSFML::CommandResult PicSFML::RunCommand(const std::string &command)
 {
     std::string output;
     char buffer[128];
@@ -72,7 +66,7 @@ bool CreateWindowsResources(const PicSFML::Project &project, const std::string &
     {
         PicSFML::Debug::Message("Creating icon");
 
-        CommandResult createicon_result = RunCommand("cd \"" + picsfmltemp_dir_path + "\" && " + "\"" + picsfml_dir_path + "\\pngtoico.exe\" " + "--input \"" + icon_path + "\" " + "--output \"" + picsfmltemp_dir_path + "\\icon.ico\"");
+        PicSFML::CommandResult createicon_result = PicSFML::RunCommand("cd \"" + picsfmltemp_dir_path + "\" && " + "\"" + picsfml_dir_path + "\\pngtoico.exe\" " + "--input \"" + icon_path + "\" " + "--output \"" + picsfmltemp_dir_path + "\\icon.ico\"");
 
         if (createicon_result.exit_code != 0)
         {
@@ -143,7 +137,7 @@ bool CreateWindowsResources(const PicSFML::Project &project, const std::string &
 
     PicSFML::Debug::Message("Compiling windows resources");
 
-    CommandResult compile_windows_resource_result = RunCommand("cd \"" + picsfmltemp_dir_path + "\" && " + "\"" + project.GetConfig().Get("compiler_dir_path") + "\\bin\\windres.exe\" resource.rc -O coff -o resource.o");
+    PicSFML::CommandResult compile_windows_resource_result = PicSFML::RunCommand("cd \"" + picsfmltemp_dir_path + "\" && " + "\"" + project.GetConfig().Get("compiler_dir_path") + "\\bin\\windres.exe\" resource.rc -O coff -o resource.o");
 
     if (compile_windows_resource_result.exit_code != 0)
     {
@@ -188,7 +182,7 @@ bool CompileProject(const PicSFML::Project &project, const std::string &picsfmlt
     PicSFML::Debug::Message("Compiling main.cpp");
     PicSFML::Debug::Log("Compile command: " + compile_command);
 
-    CommandResult compile_result = RunCommand(compile_command);
+    PicSFML::CommandResult compile_result = PicSFML::RunCommand(compile_command);
 
     if (compile_result.exit_code != 0)
     {
@@ -240,7 +234,7 @@ bool LinkProject(const PicSFML::Project &project, const std::string &picsfmltemp
     PicSFML::Debug::Message("Linking project");
     PicSFML::Debug::Log("Link command: " + link_command);
 
-    CommandResult link_result = RunCommand(link_command);
+    PicSFML::CommandResult link_result = PicSFML::RunCommand(link_command);
 
     if (link_result.exit_code != 0)
     {

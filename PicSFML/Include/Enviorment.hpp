@@ -24,7 +24,7 @@ namespace PicSFML
 
     const std::string IconName = "icon.png";
 
-    const std::string PicSFMLVersion = "3.0.0";
+    const std::string PicSFMLVersion = "3.0.2";
 
     const std::string SFMLAudioDefining = "AUDIO";
     const std::string SFMLNetworkDefining = "NETWORK";
@@ -47,6 +47,14 @@ namespace PicSFML
         std::string sfml_version;
         bool create_vscode_files;
     };
+
+    struct CommandResult
+    {
+        std::string output;
+        int exit_code;
+    };
+
+    CommandResult RunCommand(const std::string &command);
 
     class Enviorment
     {

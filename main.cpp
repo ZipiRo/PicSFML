@@ -350,7 +350,7 @@ void VersionCommand()
     PicSFML::Debug::Message("PicSFML SFML Project Creator & Builder");
     PicSFML::Debug::Message("Created to simplify SFML project creation, easier with including code and linking libraryes.");
     PicSFML::Debug::Message("Surely works with SFML-2.6.2, SFML-3.0.0, more in the future.");
-    PicSFML::Debug::Message("Created on 05/05/2026 and Last Updated 09/02/2026.");
+    PicSFML::Debug::Message("Created on 05/05/2026 and Last Updated 09/04/2026.");
     PicSFML::Debug::Message("PicSFML version " + PicSFML::PicSFMLVersion);
     PicSFML::Debug::Message("By ZipiRo");
     PicSFML::Debug::Message("");
