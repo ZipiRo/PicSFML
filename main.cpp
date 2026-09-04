@@ -7,7 +7,7 @@
 #ifdef _WIN32
     #include <windows.h>
 
-    std::string GetExecutableDir() 
+    std::string GetExecutablePath() 
     {
         char buffer[MAX_PATH];
         GetModuleFileNameA(NULL, buffer, MAX_PATH);
@@ -418,7 +418,9 @@ void InterfaceCommand()
 
 void ExecuteCommand(const ParsedCommand &parsed_command)
 {
-    PicSFML::Enviorment::Init(GetExecutableDir());
+    const std::string executable_path = GetExecutablePath(); 
+
+    PicSFML::Enviorment::Init(executable_path);
 
     if(auto settings_result = PicSFML::Enviorment::GetSettings())
     {
@@ -463,6 +465,8 @@ void ExecuteCommand(const ParsedCommand &parsed_command)
     case CommandType::Help:
         HelpCommand(parsed_command.options);
         break;
+    case CommandType::GetPath:
+        PicSFML::Debug::Message("PicSFML Directory '" + std::filesystem::path(executable_path).make_preferred().parent_path().string() + "'");
     case CommandType::Interface:
         InterfaceCommand();
         break;

@@ -17,7 +17,8 @@ enum class CommandType
     Help,
     Config,
     Defaults,
-    Settings
+    Settings,
+    GetPath
 };
 
 enum class ArgType
@@ -132,6 +133,11 @@ static const std::unordered_map<std::string, HelpInfo> CommandHelpInfo = {
     { "help", {
         "picsfml help --command <command>",
         "Prints general help, or detailed help for a specific command.",
+        {}
+    }},
+    { "get-path", {
+        "picsfml get-path",
+        "Prints the path to PicSFML directory",
         {}
     }},
     { "interface", {
@@ -259,6 +265,14 @@ static const std::unordered_map<std::string, CommandInfo> CommandsInfo = {
             "version",
             {},
             CommandType::Version,
+            false,
+            0
+        }
+    },
+    { "get-path", { 
+            "get-path",
+            {},
+            CommandType::GetPath,
             false,
             0
         }

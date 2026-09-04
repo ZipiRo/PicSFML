@@ -68,7 +68,7 @@ namespace PicSFML
         Enviorment(const Enviorment &) = delete;
         Enviorment &operator=(const Enviorment &) = delete;
 
-        static void Init(const std::string &picsfml_directory);
+        static bool Init(const std::string &picsfml_directory);
         static bool SetProject(const std::string &projct_path);
         static bool HasProject();
         static void UnsetProject();

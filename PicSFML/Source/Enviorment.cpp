@@ -650,7 +650,7 @@ bool CreateVSCodeFiles(const PicSFML::ProjectConfig &project_config, const std::
     return true;
 }
 
-void PicSFML::Enviorment::Init(const std::string &picsfml_directory)
+bool PicSFML::Enviorment::Init(const std::string &picsfml_directory)
 {
     auto &instance = GetInstance();
 
@@ -676,7 +676,7 @@ void PicSFML::Enviorment::Init(const std::string &picsfml_directory)
         if (error_code)
         {
             Debug::Error("Failed to create PicSFML data directory: " + error_code.message());
-            return;
+            return false;
         }
     }
 
@@ -691,7 +691,7 @@ void PicSFML::Enviorment::Init(const std::string &picsfml_directory)
         if (error_code)
         {
             Debug::Error("Failed to create PicSFML temp directory: " + error_code.message());
-            return;
+            return false;
         }
     }
 
@@ -709,7 +709,7 @@ void PicSFML::Enviorment::Init(const std::string &picsfml_directory)
         if (!settings.Save(instance.picsfmldata_dir_path))
         {
             Debug::Error("Failed to create settings file");
-            return;
+            return false;
         }
     }
 
@@ -722,13 +722,15 @@ void PicSFML::Enviorment::Init(const std::string &picsfml_directory)
         if (!config_defaults.Save(instance.picsfmldata_dir_path))
         {
             Debug::Error("Failed to create config defaults");
-            return;
+            return false;
         }
     }
 
     instance.initialized = true;
 
     Debug::Message("PicSFML initialized successfully");
+    
+    return true;
 }
 
 bool PicSFML::Enviorment::SetProject(const std::string &project_path)
