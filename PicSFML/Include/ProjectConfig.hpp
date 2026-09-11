@@ -8,8 +8,6 @@
 namespace PicSFML
 {
     const std::string ProjectConfigName = ".picsfml_config";
-
-    const int ProjectConfigVersion = 1;
     
     class ProjectConfig : public Data
     {

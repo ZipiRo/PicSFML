@@ -24,7 +24,7 @@ namespace PicSFML
 
     const std::string IconName = "icon.png";
 
-    const std::string PicSFMLVersion = "3.0.2";
+    const std::string PicSFMLVersion = "3.0.3";
 
     const std::string SFMLAudioDefining = "AUDIO";
     const std::string SFMLNetworkDefining = "NETWORK";
@@ -83,6 +83,7 @@ namespace PicSFML
         static bool SaveProjectConfig();
         static bool CreateProjectConfig(const std::string &path);
         static std::optional<std::reference_wrapper<ProjectConfig>> GetProjectConfig();
+        static bool SetProjectConfig(const ProjectConfig &project_config);
         
         static std::optional<std::reference_wrapper<ConfigDefaults>> GetConfigDefaults();
         static std::optional<std::reference_wrapper<Settings>> GetSettings();

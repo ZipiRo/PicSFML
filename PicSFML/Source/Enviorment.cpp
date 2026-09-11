@@ -845,6 +845,29 @@ std::optional<std::reference_wrapper<PicSFML::ProjectConfig>> PicSFML::Enviormen
     return instance.project.GetConfig();
 }
 
+bool PicSFML::Enviorment::SetProjectConfig(const ProjectConfig &project_config)
+{
+    auto &instance = GetInstance();
+
+    if (!instance.initialized)
+    {
+        Debug::Error("Cannot get project configuration: PicSFML was not initialized");
+        return false;
+    }
+
+    if (!instance.project_set)
+    {
+        Debug::Error("Cannot get project configuration: no project is set");
+        return false;
+    }
+
+    Debug::Log("Project configuration changed successfuly");
+
+    instance.project.SetConfig(project_config);
+
+    return true;
+}
+
 std::optional<std::reference_wrapper<PicSFML::ConfigDefaults>> PicSFML::Enviorment::GetConfigDefaults()
 {
     auto &instance = GetInstance();

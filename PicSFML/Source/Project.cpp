@@ -66,6 +66,13 @@ const PicSFML::ProjectConfig &PicSFML::Project::GetConfig() const
     return project_config;
 }
 
+void PicSFML::Project::SetConfig(const ProjectConfig config)
+{
+    Debug::DebugLog("[Project::SetConfig] Setting project config");
+
+    project_config = config;   
+}
+
 bool PicSFML::Project::SaveConfig()
 {
     Debug::Log("[Project::SaveConfig] Saving project configuration...");

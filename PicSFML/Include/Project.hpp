@@ -18,6 +18,7 @@ namespace PicSFML
         std::string GetPath() const;
         ProjectConfig &GetConfig();
         const ProjectConfig &GetConfig() const;
+        void SetConfig(const ProjectConfig project_config);
         bool SaveConfig();
     };
 }

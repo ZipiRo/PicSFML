@@ -7,8 +7,6 @@ namespace PicSFML
 {
     const std::string DefaultsName = ".picsfml_config_defaults";
 
-    const int ConfigDefaultsVersion = 1;
-
     class ConfigDefaults : public Data
     {
     private:

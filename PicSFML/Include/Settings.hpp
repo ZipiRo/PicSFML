@@ -7,8 +7,6 @@ namespace PicSFML
 {
     const std::string SettingsName = ".picsfml_settings";
 
-    const int SettingsVersion = 1;
-
     class Settings : public Data
     {
     private:
