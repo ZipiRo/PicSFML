@@ -24,7 +24,7 @@ namespace PicSFML
 
     const std::string IconName = "icon.png";
 
-    const std::string PicSFMLVersion = "3.0.3";
+    const std::string PicSFMLVersion = "3.0.4";
 
     const std::string SFMLAudioDefining = "AUDIO";
     const std::string SFMLNetworkDefining = "NETWORK";

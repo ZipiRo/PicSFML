@@ -413,14 +413,17 @@ void HelpCommand(const std::vector<ParsedCommand::Option> &options)
 
 void InterfaceCommand()
 {
-    
+    PicSFML::Debug::Message("");
+    PicSFML::Debug::Message("Interface is not available for now, comming soon!");
+    PicSFML::Debug::Message("");
 }
 
-void ExecuteCommand(const ParsedCommand &parsed_command)
+bool ExecuteCommand(const ParsedCommand &parsed_command)
 {
     const std::string executable_path = GetExecutablePath(); 
 
-    PicSFML::Enviorment::Init(executable_path);
+    if(PicSFML::Enviorment::Init(executable_path))
+        return false;
 
     if(auto settings_result = PicSFML::Enviorment::GetSettings())
     {
@@ -431,6 +434,10 @@ void ExecuteCommand(const ParsedCommand &parsed_command)
         if(settings_debug_mode == "verbose")     PicSFML::Debug::SetMode(PicSFML::Debug::Mode::Verbose);
         else if(settings_debug_mode == "quiet")  PicSFML::Debug::SetMode(PicSFML::Debug::Mode::Quiet);
         else if(settings_debug_mode == "normal") PicSFML::Debug::SetMode(PicSFML::Debug::Mode::Normal);
+    }
+    else 
+    {
+        return false;
     }
 
     if(parsed_command.debug_mode == "verbose")     PicSFML::Debug::SetMode(PicSFML::Debug::Mode::Verbose);
@@ -474,7 +481,13 @@ void ExecuteCommand(const ParsedCommand &parsed_command)
         break;
     }
 
-    if(!valid) PicSFML::Debug::Message("See the latest debug file in the log directory '" + PicSFML::Debug::GetLogDirectory() + "' ");
+    if(!valid) 
+    {
+        PicSFML::Debug::Message("See the latest debug file in the log directory '" + PicSFML::Debug::GetLogDirectory() + "' ");
+        return false;
+    }
+
+    return true;
 }
 
 int main(int argc, char *argv[])
@@ -482,7 +495,8 @@ int main(int argc, char *argv[])
     if(auto parse_result = ParseCommand(argc, argv))
     {
         ParsedCommand parsed_command = *parse_result;
-        ExecuteCommand(parsed_command);
+        if(!ExecuteCommand(parsed_command))
+            return 1;
     }
 
     return 0;
